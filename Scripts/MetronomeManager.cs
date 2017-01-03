@@ -1,59 +1,47 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class MetronomeManager : MonoBehaviour {
 
-	public Image[] beats;
 	public float tempo;
+	public Beat beatPrefab;
 
-
+	private Vector3 spawnPoint; 
+	private HashSet<Beat> beats;
+	private Canvas canvas;
+	private bool onBeat;
 	private int ticker;
-	private float timeTracker;
+	private float bps;
 
 	// Use this for initialization
 	void Start () {
-		ticker = 0;
-		UpdatePosition();
+		beats = new HashSet<Beat>();
+		spawnPoint = new Vector3(175f, 215f, 0f);
+		canvas = this.transform.parent.GetComponent<Canvas>();
+		bps = tempo / 60f;
+		Debug.Log(bps);
 	}
 	
 	// Update is called once per frame
 
-	void UpdatePosition ()
+	void Update ()
 	{
-		for (int i = 0; i < 4; i++) {
-
-			beats [i].transform.Translate (new Vector3 (-100 / 60f, 0f, 0f));
-
-		}
-
-		if (ticker == 0) {
-			beats [0].GetComponent<RectTransform>().anchoredPosition = new Vector3(175f, 215f, 0f);
-			timeTracker = Time.time;
-		} else if (ticker == 60) {
-			beats [1].GetComponent<RectTransform>().anchoredPosition = new Vector3(175f, 215f, 0f);
-			//Debug.Log(Time.time - timeTracker + " since last beat update.");
-			timeTracker = Time.time;
-		} else if (ticker == 120) {
-			beats [2].GetComponent<RectTransform>().anchoredPosition = new Vector3(175f, 215f, 0f);
-			//Debug.Log(Time.time - timeTracker + " since last beat update.");
-			timeTracker = Time.time;
-		} else if (ticker == 180) {
-			beats [3].GetComponent<RectTransform>().anchoredPosition = new Vector3(175f, 215f, 0f);
-			//Debug.Log(Time.time - timeTracker + " since last beat update.");
-			timeTracker = Time.time;
-		} else if (ticker == 239) {
-			ticker = -1;
-		}
-
 		ticker++;
-		Invoke("UpdatePosition", 1/tempo);
+
+		if (ticker % Mathf.RoundToInt(60 / bps) == 0) {
+			Beat newBeat = Instantiate(beatPrefab) as Beat; 
+			newBeat.transform.SetParent(canvas.transform);
+			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
+			newBeat.InitiateBeat(400f / (4f / bps));
+
+
+		}
+
 	}
 
 	public bool IsOnBeat(){
-		return (ticker > 55 && ticker < 65) ||
-			   (ticker > 115 && ticker < 125) ||
-			   (ticker > 175 && ticker < 185) ||
-			   (ticker > 235 && ticker < 5);
+		return onBeat;
 	}
 }
