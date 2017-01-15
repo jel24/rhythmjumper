@@ -7,6 +7,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	public float tempo;
 	public Beat beatPrefab;
+	public Image[] powerUpImages;
 
 	private Vector3 spawnPoint; 
 	private HashSet<Beat> beats;
@@ -43,5 +44,10 @@ public class MetronomeManager : MonoBehaviour {
 
 	public bool IsOnBeat(){
 		return onBeat;
+	}
+
+	public void changePowerUpStatus (int type, bool onOff)
+	{
+		powerUpImages[type].gameObject.SetActive(onOff);
 	}
 }

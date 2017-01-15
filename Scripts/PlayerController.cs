@@ -50,6 +50,12 @@ public class PlayerController : MonoBehaviour {
 				rigidbody.isKinematic = true;
 			}
 
+			if (statusManager.HasBuff("Metronome")){
+				maxBonusJumps = 3;
+			} else {
+				maxBonusJumps = 1;
+			}
+
 			if (CrossPlatformInputManager.GetButtonDown ("Fire1")) {
 				Jump ();
 			}
