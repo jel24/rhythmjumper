@@ -28,7 +28,7 @@ public class PlayerStatusManager : MonoBehaviour {
 	
 	public void Kill ()
 	{
-		Debug.Log("told to kill");
+		//Debug.Log("told to kill");
 		if (alive) {
 			Debug.Log("killed!");
 			alive = false;

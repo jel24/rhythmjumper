@@ -15,8 +15,6 @@ public class PlayerComponent : MonoBehaviour {
 		if (coll.gameObject.tag == "Wall") {
 			//Debug.Log(gameObject.name);
 			parent.StartTouching(gameObject.name);
-			//jumping = false;
-			//animator.SetBool("jumping", false);
 		}
 	}
 
@@ -24,9 +22,7 @@ public class PlayerComponent : MonoBehaviour {
 	{
 		if (coll.gameObject.tag == "Wall") {
 			//Debug.Log(gameObject.name);
-			parent.StartTouching(gameObject.name);
-			//jumping = false;
-			//animator.SetBool("jumping", false);
+			parent.EndTouching(gameObject.name);
 		}
 	}
 
@@ -35,8 +31,6 @@ public class PlayerComponent : MonoBehaviour {
 		if (coll.gameObject.tag == "Wall") {
 			//Debug.Log(gameObject.name);
 			parent.StartTouching(gameObject.name);
-			//jumping = false;
-			//animator.SetBool("jumping", false);
 		}
 	}
 

@@ -18,12 +18,12 @@ public class PlayerController : MonoBehaviour {
 	private Animator animator;
 	private SpriteRenderer renderer;
 
-	private bool jumping;
+	public bool jumping;
 	private int jumpCooldown;
-	private bool onWallRight;
-	private bool onWallLeft;
-	private bool headTouching;
-	private bool feetTouching;
+	public bool onWallRight;
+	public bool onWallLeft;
+	public bool headTouching;
+	public bool feetTouching;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour {
 			} else {
 				maxBonusJumps = 1;
 			}
-
+		
 			if (CrossPlatformInputManager.GetButtonDown ("Fire1")) {
 				Jump ();
 			}
@@ -99,25 +99,29 @@ public class PlayerController : MonoBehaviour {
 
 	private void Jump ()
 	{
+
 		if (!jumping) {
 
 			jumping = true;
 			
 			if (onWallLeft) {
-				rigidbody.velocity = new Vector2(rigidbody.velocity.x + 5f, jumpSpeed);
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x + 5f, jumpSpeed);
 				jumpCooldown += jumpCooldownMax;
 			} else if (onWallRight) {
-				rigidbody.velocity = new Vector2(rigidbody.velocity.x -5f, jumpSpeed);
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x - 5f, jumpSpeed);
 				jumpCooldown += jumpCooldownMax;
 			} else {
-				rigidbody.velocity = new Vector2(rigidbody.velocity.x, jumpSpeed);
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 				jumpCooldown += jumpCooldownMax;
 			}
 
-		} else if (jumping && bonusJumps > 0){
+		} else if (jumping && bonusJumps > 0) {
 			bonusJumps--;
-			rigidbody.velocity = new Vector2(rigidbody.velocity.x, jumpSpeed);
+			Debug.Log (bonusJumps + " jumps left.");
+			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 			jumpCooldown += jumpCooldownMax;
+		} else {
+			Debug.Log ("Out of jumps!");
 		}
 
 	}
@@ -137,6 +141,8 @@ public class PlayerController : MonoBehaviour {
 			jumping = false;
 			if (!headTouching) {
 				bonusJumps = maxBonusJumps;
+				Debug.Log("Resetting jumps LEFT.");
+
 			}
 			if (!feetTouching) {
 				animator.SetBool("onwall", true);
@@ -148,6 +154,7 @@ public class PlayerController : MonoBehaviour {
 			jumping = false;
 			if (!headTouching) {
 				bonusJumps = maxBonusJumps;
+				Debug.Log("Resetting jumps RIGHT.");
 			}
 			if (!feetTouching) {
 				animator.SetBool("onwall", true);
