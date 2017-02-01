@@ -6,6 +6,7 @@ public class MusicManager : MonoBehaviour {
 
 	public Text countDownText;
 	public GameObject player;
+	public MetronomeManager metronome;
 
 	private AudioSource audioSource;
 	private int timeToStart;
@@ -31,9 +32,10 @@ public class MusicManager : MonoBehaviour {
 		} else if (timeToStart == 0) {
 			countDownText.text = "Go!";
 			timeToStart--;
-			Invoke ("CountDown", 1f);
 			audioSource.Play();
+			metronome.Downbeat ();
 			player.GetComponent<PlayerStatusManager>().StartLevel();
+			Invoke ("CountDown", 1f);
 
 		} else if (timeToStart < 0) {
 			countDownText.text = "";

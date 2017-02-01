@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
 	//public int jumpFrameLimit;
 	public int jumpCooldownMax;
 	public int maxBonusJumps;
+	public MetronomeManager metronomeManager;
 
 	private PlayerStatusManager statusManager;
 
@@ -20,10 +21,10 @@ public class PlayerController : MonoBehaviour {
 
 	public bool jumping;
 	private int jumpCooldown;
-	public bool onWallRight;
-	public bool onWallLeft;
-	public bool headTouching;
-	public bool feetTouching;
+	private bool onWallRight;
+	private bool onWallLeft;
+	private bool headTouching;
+	private bool feetTouching;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -52,6 +53,8 @@ public class PlayerController : MonoBehaviour {
 
 			if (statusManager.HasBuff("Metronome")){
 				maxBonusJumps = 3;
+			} else if (statusManager.HasBuff("Streak")){
+				maxBonusJumps = 2;
 			} else {
 				maxBonusJumps = 1;
 			}
@@ -88,6 +91,7 @@ public class PlayerController : MonoBehaviour {
 		} else {
 			if (rigidbody.isKinematic == false && statusManager.IsAlive() == false) {
 				rigidbody.isKinematic = true;
+				rigidbody.velocity = Vector2.zero;
 			}
 
 		}
@@ -115,11 +119,23 @@ public class PlayerController : MonoBehaviour {
 				jumpCooldown += jumpCooldownMax;
 			}
 
+			if (metronomeManager.IsOnBeat ()) {
+				metronomeManager.AddStreak ();
+			} else {
+				metronomeManager.EndStreak ();
+			}
+
 		} else if (jumping && bonusJumps > 0) {
 			bonusJumps--;
 			Debug.Log (bonusJumps + " jumps left.");
 			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 			jumpCooldown += jumpCooldownMax;
+
+			if (metronomeManager.IsOnBeat ()) {
+				metronomeManager.AddStreak ();
+			} else {
+				metronomeManager.EndStreak ();
+			}
 		} else {
 			Debug.Log ("Out of jumps!");
 		}
@@ -141,7 +157,7 @@ public class PlayerController : MonoBehaviour {
 			jumping = false;
 			if (!headTouching) {
 				bonusJumps = maxBonusJumps;
-				Debug.Log("Resetting jumps LEFT.");
+				//Debug.Log("Resetting jumps LEFT.");
 
 			}
 			if (!feetTouching) {
@@ -154,7 +170,7 @@ public class PlayerController : MonoBehaviour {
 			jumping = false;
 			if (!headTouching) {
 				bonusJumps = maxBonusJumps;
-				Debug.Log("Resetting jumps RIGHT.");
+				//Debug.Log("Resetting jumps RIGHT.");
 			}
 			if (!feetTouching) {
 				animator.SetBool("onwall", true);

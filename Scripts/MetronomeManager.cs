@@ -8,13 +8,21 @@ public class MetronomeManager : MonoBehaviour {
 	public float tempo;
 	public Beat beatPrefab;
 	public Image[] powerUpImages;
+	public MusicManager musicManager;
+	public float errorThreshold;
+	public Image[] streakImages;
+	public PlayerStatusManager statusManager;
 
 	private Vector3 spawnPoint; 
 	private HashSet<Beat> beats;
 	private Canvas canvas;
 	private bool onBeat;
-	private int ticker;
 	private float bps;
+	private bool reset;
+	private AudioSource chime;
+	private int streak;
+	private Color active;
+	private Color inactive;
 
 	// Use this for initialization
 	void Start () {
@@ -22,32 +30,79 @@ public class MetronomeManager : MonoBehaviour {
 		spawnPoint = new Vector3(175f, 215f, 0f);
 		canvas = this.transform.parent.GetComponent<Canvas>();
 		bps = tempo / 60f;
-		Debug.Log(bps);
+		chime = GetComponent<AudioSource> ();
+		//Debug.Log(bps);
+		active = new Color(255f, 255f, 255f, 1f);
+		inactive = new Color(255f, 255f, 255f, .25f);
 	}
-	
-	// Update is called once per frame
 
-	void Update ()
-	{
-		ticker++;
-
-		if (ticker % Mathf.RoundToInt(60 / bps) == 0) {
-			Beat newBeat = Instantiate(beatPrefab) as Beat; 
-			newBeat.transform.SetParent(canvas.transform);
-			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
-			newBeat.InitiateBeat(400f / (4f / bps));
-
-
-		}
-
-	}
 
 	public bool IsOnBeat(){
+		if (onBeat) {
+			chime.Play ();
+		}
 		return onBeat;
 	}
 
 	public void changePowerUpStatus (int type, bool onOff)
 	{
 		powerUpImages[type].gameObject.SetActive(onOff);
+	}
+
+	public void Downbeat (){
+		bps = tempo / 60f;
+		// Debug.Log (1f / bps);
+		if (!reset) {
+			Invoke ("Downbeat", 1f / bps);
+			Invoke ("thresholdOn", (1f / bps) - errorThreshold);
+			Beat newBeat = Instantiate(beatPrefab) as Beat; 
+			newBeat.transform.SetParent(canvas.transform);
+			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
+			newBeat.InitiateBeat(400f / (4f / bps));
+			Invoke ("thresholdOff", errorThreshold);
+		}
+		// chime.Play ();
+	}
+
+	private void thresholdOn(){
+		onBeat = true;
+	}
+
+	private void thresholdOff(){
+		onBeat = false;
+	}
+
+	public void Reset(){
+		reset = true;
+		EndStreak ();
+	}
+
+	public void Restart(){
+		reset = false;
+	}
+
+	public void AddStreak(){
+		streak++;
+
+		if (streak == 1) {
+			streakImages [0].color = active;
+		} else if (streak == 2) {
+			streakImages [1].color = active;
+		} else if (streak == 3) {
+			streakImages [2].color = active;
+		} else if (streak == 4) {
+			streakImages [3].color = active;
+			statusManager.AddPowerUp("Streak");
+		} else if (streak > 4) {
+
+		}
+	}
+
+	public void EndStreak(){
+		streak = 0;
+		for (int i = 0; i < 4; i++) {
+			streakImages [i].color = inactive;
+			statusManager.RemovePowerUp ("Streak");
+		}
 	}
 }

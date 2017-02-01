@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Buff : MonoBehaviour {
+public class Buff : ScriptableObject {
 
 	private string buffType;
 

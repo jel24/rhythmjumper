@@ -35,6 +35,8 @@ public class PlayerStatusManager : MonoBehaviour {
 			Invoke("Respawn", 2f);
 			animator.SetTrigger("death");
 			musicManager.GetComponent<AudioSource>().Stop();
+			metronomeManager.Reset ();
+			ResetBuffs ();
 		}
 
 	}
@@ -52,6 +54,7 @@ public class PlayerStatusManager : MonoBehaviour {
 		foreach (Powerup p in powerups) {
 			p.gameObject.SetActive(true);
 		}
+		metronomeManager.Restart();
 	}
 
 	public void StartLevel ()
@@ -68,7 +71,7 @@ public class PlayerStatusManager : MonoBehaviour {
 			} 
 		}
 		if (isBuffNew) {
-			Buff newBuff = new Buff ();
+			Buff newBuff = ScriptableObject.CreateInstance<Buff> ();
 			newBuff.SetBuffType (powerUpType);
 			activeBuffs.Add (newBuff);
 
@@ -78,9 +81,31 @@ public class PlayerStatusManager : MonoBehaviour {
 				metronomeManager.changePowerUpStatus(0, true);
 			}
 
-
+			if (powerUpType == "Streak") {
+				metronomeManager.changePowerUpStatus(1, true);
+			}
 		}
 
+	}
+
+	public void RemovePowerUp (string powerUpType){
+		Buff targetBuff = null;
+		foreach (Buff b in activeBuffs) {
+			if (b.GetBuffType () == powerUpType) {
+				targetBuff = b;
+			} 
+		}
+
+		if (targetBuff != null) {
+			if (targetBuff.GetBuffType() == "Metronome") {
+				metronomeManager.changePowerUpStatus(0, false);
+			}
+
+			if (targetBuff.GetBuffType() == "Streak") {
+				metronomeManager.changePowerUpStatus(1, false);
+			}
+			activeBuffs.Remove (targetBuff);
+		}
 	}
 
 	public bool HasBuff (string buff)
@@ -91,5 +116,11 @@ public class PlayerStatusManager : MonoBehaviour {
 			}
 		}
 		return false;
+	}
+
+	private void ResetBuffs(){
+		metronomeManager.changePowerUpStatus(0, false);
+		metronomeManager.changePowerUpStatus(1, false);
+		activeBuffs.Clear ();
 	}
 }
