@@ -8,6 +8,7 @@ public class PlayerStatusManager : MonoBehaviour {
 	public Vector3 startLocation;
 	public MusicManager musicManager;
 	public MetronomeManager metronomeManager;
+	public CameraController cameraController;
 
 	private Animator animator;
 	private bool alive;
@@ -37,6 +38,7 @@ public class PlayerStatusManager : MonoBehaviour {
 			musicManager.GetComponent<AudioSource>().Stop();
 			metronomeManager.Reset ();
 			ResetBuffs ();
+			cameraController.ChangeCameraSize (5.5f);
 		}
 
 	}
@@ -48,7 +50,7 @@ public class PlayerStatusManager : MonoBehaviour {
 
 	private void Respawn ()
 	{
-		this.transform.position = startLocation;
+		transform.position = startLocation;
 		animator.SetTrigger ("respawn");
 		musicManager.StartMusic ();
 		foreach (Powerup p in powerups) {

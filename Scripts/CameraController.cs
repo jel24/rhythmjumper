@@ -7,7 +7,15 @@ public class CameraController : MonoBehaviour {
 	public GameObject background;
 	public float thresholdX;
 	public float thresholdY;
-	
+
+	private Camera cam;
+	private float targetSize;
+
+	void Start () {
+		cam = GetComponent<Camera> ();
+		targetSize = 5.5f;
+	}
+
 	// Update is called once per frame
 	void Update ()
 	{
@@ -30,6 +38,15 @@ public class CameraController : MonoBehaviour {
 			background.transform.Translate(translationVector/5f);
 		}
 
+		if (cam.orthographicSize > targetSize) {
+			cam.orthographicSize = cam.orthographicSize - .01f;
+		} else if (cam.orthographicSize < targetSize) {
+			cam.orthographicSize = cam.orthographicSize + .01f;
+		}
 
+	}
+
+	public void ChangeCameraSize(float f){
+		targetSize = f;
 	}
 }
