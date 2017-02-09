@@ -10,9 +10,11 @@ public class CameraController : MonoBehaviour {
 
 	private Camera cam;
 	private float targetSize;
+	private float defaultSize;
 
 	void Start () {
 		cam = GetComponent<Camera> ();
+		defaultSize = 5.5f;
 		targetSize = 5.5f;
 	}
 
@@ -48,5 +50,13 @@ public class CameraController : MonoBehaviour {
 
 	public void ChangeCameraSize(float f){
 		targetSize = f;
+	}
+
+	public void SetDefaultSize(float f){
+		defaultSize = f;
+	}
+
+	public void SetSizeToDefault(){
+		ChangeCameraSize (defaultSize);
 	}
 }

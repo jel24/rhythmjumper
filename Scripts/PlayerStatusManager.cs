@@ -38,7 +38,7 @@ public class PlayerStatusManager : MonoBehaviour {
 			musicManager.GetComponent<AudioSource>().Stop();
 			metronomeManager.Reset ();
 			ResetBuffs ();
-			cameraController.ChangeCameraSize (5.5f);
+			cameraController.SetSizeToDefault ();
 		}
 
 	}

@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour {
 
+	public float camSize;
+
+	private Camera cam;
+
+	void Start(){
+		cam = FindObjectOfType<Camera> ();
+	}
+
 	void OnDrawGizmos(){
 		Gizmos.color = Color.red;
 		Gizmos.DrawSphere (transform.position, 1);
@@ -12,7 +20,9 @@ public class Checkpoint : MonoBehaviour {
 	void OnTriggerEnter2D (Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Player") {
-			coll.gameObject.GetComponentInParent<PlayerStatusManager> ().startLocation = transform.position;
+			cam.GetComponent<CameraController>().SetDefaultSize (camSize);
+			Debug.Log ("Setting default camera size on " + cam.name + " to " + camSize);
+			coll.gameObject.GetComponentInParent<PlayerStatusManager> ().startLocation = new Vector3 (transform.position.x, transform.position.y, 0f);
 		}
 	}
 }

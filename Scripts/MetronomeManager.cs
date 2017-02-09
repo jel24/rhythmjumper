@@ -12,8 +12,8 @@ public class MetronomeManager : MonoBehaviour {
 	public float errorThreshold;
 	public Image[] streakImages;
 	public PlayerStatusManager statusManager;
+	public Vector3 spawnPoint; 
 
-	private Vector3 spawnPoint; 
 	private HashSet<Beat> beats;
 	private Canvas canvas;
 	private bool onBeat;
@@ -27,7 +27,6 @@ public class MetronomeManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		beats = new HashSet<Beat>();
-		spawnPoint = new Vector3(175f, 215f, 0f);
 		canvas = this.transform.parent.GetComponent<Canvas>();
 		bps = tempo / 60f;
 		chime = GetComponent<AudioSource> ();
@@ -58,7 +57,7 @@ public class MetronomeManager : MonoBehaviour {
 			Beat newBeat = Instantiate(beatPrefab) as Beat; 
 			newBeat.transform.SetParent(canvas.transform);
 			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
-			newBeat.InitiateBeat(400f / (4f / bps));
+			newBeat.InitiateBeat(300f / (4f / bps));
 			Invoke ("thresholdOff", errorThreshold);
 		}
 		// chime.Play ();
