@@ -48,6 +48,10 @@ public class MetronomeManager : MonoBehaviour {
 		powerUpImages[type].gameObject.SetActive(onOff);
 	}
 
+	public bool GetPowerUpStatus (int type){
+		return powerUpImages [type].gameObject.activeInHierarchy;
+	}
+
 	public void Downbeat (){
 		bps = tempo / 60f;
 		// Debug.Log (1f / bps);

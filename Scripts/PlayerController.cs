@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour {
 	private bool headTouching;
 	private bool feetTouching;
 
+	private int metronomeCounter;
+
 	float[] prevFrames = new float[3] {0, 0, 0};
 
 	// Use this for initialization
@@ -51,16 +53,22 @@ public class PlayerController : MonoBehaviour {
 				rigidbody.isKinematic = true;
 			}
 
-			if (statusManager.HasBuff("Metronome")){
+			maxBonusJumps = 1;
+
+			if (statusManager.HasBuff("Streak")){
+				maxBonusJumps += 1;
+			} 
+
+			if (statusManager.HasBuff("MetronomeActive")){
 				maxBonusJumps = 3;
-			} else if (statusManager.HasBuff("Streak")){
-				maxBonusJumps = 2;
-			} else {
-				maxBonusJumps = 1;
 			}
 		
-			if (CrossPlatformInputManager.GetButtonDown ("Fire1")) {
+			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 				Jump ();
+			}
+
+			if (CrossPlatformInputManager.GetButtonDown ("UsePowerup")) {
+				UsePowerup ();
 			}
 
 			if (jumpCooldown > 0) {
@@ -121,8 +129,22 @@ public class PlayerController : MonoBehaviour {
 
 			if (metronomeManager.IsOnBeat ()) {
 				metronomeManager.AddStreak ();
+
+				if (statusManager.HasBuff ("MetronomeActive")){
+					metronomeCounter++;
+
+					if (metronomeCounter >= 3){
+						print ("Removing Metronome, expired.");
+						statusManager.RemovePowerUp ("MetronomeActive");
+					}
+				}
+
 			} else {
 				metronomeManager.EndStreak ();
+				if (statusManager.HasBuff ("MetronomeActive")){
+					print ("Removing Metronome, off beat.");
+					statusManager.RemovePowerUp ("MetronomeActive");
+				}
 			}
 
 		} else if (jumping && bonusJumps > 0) {
@@ -133,8 +155,22 @@ public class PlayerController : MonoBehaviour {
 
 			if (metronomeManager.IsOnBeat ()) {
 				metronomeManager.AddStreak ();
+
+				if (statusManager.HasBuff ("MetronomeActive")){
+					metronomeCounter++;
+
+					if (metronomeCounter >= 3){
+						print ("Removing Metronome, expired.");
+						statusManager.RemovePowerUp ("MetronomeActive");
+					}
+				}
+
 			} else {
 				metronomeManager.EndStreak ();
+				if (statusManager.HasBuff ("MetronomeActive")){
+					print ("Removing Metronome, off beat.");
+					statusManager.RemovePowerUp ("MetronomeActive");
+				}
 			}
 		} else {
 			Debug.Log ("Out of jumps!");
@@ -200,6 +236,15 @@ public class PlayerController : MonoBehaviour {
 			animator.SetBool("jumping", true);
 			animator.SetBool("onwall", false);
 			renderer.flipX = true;
+		}
+	}
+
+	private void UsePowerup(){
+		if (statusManager.HasBuff ("Metronome")) {
+			metronomeCounter = 0;
+			statusManager.RemovePowerUp ("Metronome");
+			statusManager.AddPowerUp ("MetronomeActive");
+			bonusJumps = 3;
 		}
 	}
 

@@ -86,6 +86,10 @@ public class PlayerStatusManager : MonoBehaviour {
 			if (powerUpType == "Streak") {
 				metronomeManager.changePowerUpStatus(1, true);
 			}
+
+			if (powerUpType == "MetronomeActive") {
+				metronomeManager.changePowerUpStatus(2, true);
+			}
 		}
 
 	}
@@ -106,6 +110,10 @@ public class PlayerStatusManager : MonoBehaviour {
 			if (targetBuff.GetBuffType() == "Streak") {
 				metronomeManager.changePowerUpStatus(1, false);
 			}
+
+			if (targetBuff.GetBuffType() == "MetronomeActive") {
+				metronomeManager.changePowerUpStatus(2, false);
+			}
 			activeBuffs.Remove (targetBuff);
 		}
 	}
@@ -123,6 +131,7 @@ public class PlayerStatusManager : MonoBehaviour {
 	private void ResetBuffs(){
 		metronomeManager.changePowerUpStatus(0, false);
 		metronomeManager.changePowerUpStatus(1, false);
+		metronomeManager.changePowerUpStatus(2, false);
 		activeBuffs.Clear ();
 	}
 }
