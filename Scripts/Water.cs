@@ -17,8 +17,8 @@ public class Water : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Player") {
-			if (coll.GetComponentInParent<PlayerController> () != null) {
-				coll.GetComponentInParent<PlayerController> ().ChangeWaterStatus (true);
+			if (coll.GetComponentInParent<PlayerController> () == null) {
+				coll.GetComponent<PlayerController> ().ChangeWaterStatus (true);
 				print ("In the water!");
 			}
 
@@ -27,8 +27,8 @@ public class Water : MonoBehaviour {
 
 	void OnTriggerExit2D(Collider2D coll)
 	{
-		if (coll.GetComponentInParent<PlayerController> () != null) {
-			coll.GetComponentInParent<PlayerController> ().ChangeWaterStatus (false);
+		if (coll.GetComponentInParent<PlayerController> () == null) {
+			coll.GetComponent<PlayerController> ().ChangeWaterStatus (false);
 			print ("Out of the water.");
 		}
 	}
