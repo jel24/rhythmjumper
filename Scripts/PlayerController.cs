@@ -6,27 +6,25 @@ public class PlayerController : MonoBehaviour {
 
 	public float moveSpeed;
 	public float jumpSpeed;
-	//public int jumpFrameLimit;
 	public int jumpCooldownMax;
 	public int maxBonusJumps;
 	public MetronomeManager metronomeManager;
+	public bool jumping;
+
 
 	private PlayerStatusManager statusManager;
-
 	private int jumps;
 	private int bonusJumps;
 	private Rigidbody2D rigidbody;
 	private Animator animator;
 	private SpriteRenderer renderer;
-
-	public bool jumping;
 	private int jumpCooldown;
 	private bool onWallRight;
 	private bool onWallLeft;
 	private bool headTouching;
 	private bool feetTouching;
-
 	private int metronomeCounter;
+	private bool inWater;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -48,7 +46,18 @@ public class PlayerController : MonoBehaviour {
 		prevFrames [1] = prevFrames [0];
 		prevFrames [0] = inputX;
 
-		if (statusManager.IsAlive ()) {
+		if (statusManager.IsAlive () && inWater) {
+			if (rigidbody.isKinematic = false) {
+				rigidbody.isKinematic = true;
+			}
+
+			float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
+
+			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
+				rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
+			}
+
+		} else if (statusManager.IsAlive () && !inWater) {
 			if (rigidbody.isKinematic = false) {
 				rigidbody.isKinematic = true;
 			}
@@ -180,62 +189,71 @@ public class PlayerController : MonoBehaviour {
 
 	public void StartTouching (string name)
 	{
-		if (name == "Feet") {
-			jumping = false;
-			bonusJumps = maxBonusJumps;
-			animator.SetBool ("jumping", false);
-			animator.SetBool ("onwall", false);
-			feetTouching = true;
-		} else if (name == "Head") {
-			headTouching = true;
-		} else if (name == "Left") {
-			onWallLeft = true;
-			jumping = false;
-			if (!headTouching) {
+		if (!inWater) {
+			
+			if (name == "Feet") {
+				jumping = false;
 				bonusJumps = maxBonusJumps;
-				//Debug.Log("Resetting jumps LEFT.");
+				animator.SetBool ("jumping", false);
+				animator.SetBool ("onwall", false);
+				feetTouching = true;
+			} else if (name == "Head") {
+				headTouching = true;
+			} else if (name == "Left") {
+				onWallLeft = true;
+				jumping = false;
+				if (!headTouching) {
+					bonusJumps = maxBonusJumps;
+					//Debug.Log("Resetting jumps LEFT.");
 
+				}
+				if (!feetTouching) {
+					animator.SetBool ("onwall", true);
+				}
+				animator.SetBool ("jumping", false);
+				renderer.flipX = true;
+			} else if (name == "Right") {
+				onWallRight = true;
+				jumping = false;
+				if (!headTouching) {
+					bonusJumps = maxBonusJumps;
+					//Debug.Log("Resetting jumps RIGHT.");
+				}
+				if (!feetTouching) {
+					animator.SetBool ("onwall", true);
+				}
+				animator.SetBool ("jumping", false);
+				renderer.flipX = false;
 			}
-			if (!feetTouching) {
-				animator.SetBool("onwall", true);
-			}
-			animator.SetBool ("jumping", false);
-			renderer.flipX = true;
-		} else if (name == "Right") {
-			onWallRight = true;
-			jumping = false;
-			if (!headTouching) {
-				bonusJumps = maxBonusJumps;
-				//Debug.Log("Resetting jumps RIGHT.");
-			}
-			if (!feetTouching) {
-				animator.SetBool("onwall", true);
-			}
-			animator.SetBool("jumping", false);
-			renderer.flipX = false;
+
 		}
 	}
 
 	public void EndTouching (string name)
 	{
-		if (name == "Feet") {
-			animator.SetBool ("jumping", true);
-			jumping = true;
-			feetTouching = false;
-		} else if (name == "Head") {
-			headTouching = false;
-		} else if (name == "Left") {
-			onWallLeft = false;
-			jumping = true;
-			animator.SetBool("jumping", true);
-			animator.SetBool("onwall", false);
-			renderer.flipX = false;
-		} else if (name == "Right") {
-			onWallRight = false;
-			jumping = true;
-			animator.SetBool("jumping", true);
-			animator.SetBool("onwall", false);
-			renderer.flipX = true;
+		if (!inWater) {
+
+
+			if (name == "Feet") {
+				animator.SetBool ("jumping", true);
+				jumping = true;
+				feetTouching = false;
+			} else if (name == "Head") {
+				headTouching = false;
+			} else if (name == "Left") {
+				onWallLeft = false;
+				jumping = true;
+				animator.SetBool("jumping", true);
+				animator.SetBool("onwall", false);
+				renderer.flipX = false;
+			} else if (name == "Right") {
+				onWallRight = false;
+				jumping = true;
+				animator.SetBool("jumping", true);
+				animator.SetBool("onwall", false);
+				renderer.flipX = true;
+			}
+
 		}
 	}
 
@@ -246,6 +264,20 @@ public class PlayerController : MonoBehaviour {
 			statusManager.AddPowerUp ("MetronomeActive");
 			bonusJumps = 3;
 		}
+	}
+
+	public void ChangeWaterStatus(bool isInWater){
+
+		if (isInWater) {
+			rigidbody.gravityScale = -.2f;
+			rigidbody.drag = 2f;
+		} else {
+			rigidbody.gravityScale = 1.25f;
+			rigidbody.drag = 0f;
+		}
+
+		inWater = isInWater;
+
 	}
 
 }
