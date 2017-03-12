@@ -33,7 +33,7 @@ public class PlayerStatusManager : MonoBehaviour {
 		if (alive) {
 			Debug.Log("killed!");
 			alive = false;
-			Invoke("Respawn", 2f);
+			Invoke("Respawn", 1f);
 			animator.SetTrigger("death");
 			musicManager.GetComponent<AudioSource>().Stop();
 			metronomeManager.Reset ();
