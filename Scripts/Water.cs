@@ -4,33 +4,31 @@ using UnityEngine;
 
 public class Water : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	bool waterSpam;
 
 	void OnTriggerEnter2D(Collider2D coll)
 	{
-		if (coll.gameObject.tag == "Player") {
-			if (coll.GetComponentInParent<PlayerController> () == null) {
-				coll.GetComponent<PlayerController> ().ChangeWaterStatus (true);
-				print ("In the water!");
-			}
 
-		}
+		if (coll.gameObject.tag == "Player") {
+			coll.GetComponentInParent<PlayerController> ().ChangeWaterStatus (true);
+			print ("In the water!");
+			if (!waterSpam) {
+				GetComponent<AudioSource> ().Play ();
+				waterSpam = true;
+				Invoke ("Unspam", 1f);
+			}
+		} 
 	}
 
 	void OnTriggerExit2D(Collider2D coll)
 	{
-		if (coll.GetComponentInParent<PlayerController> () == null) {
-			coll.GetComponent<PlayerController> ().ChangeWaterStatus (false);
+		if (coll.gameObject.tag == "Player") {
+			coll.GetComponentInParent<PlayerController> ().ChangeWaterStatus (false);
 			print ("Out of the water.");
-		}
+		} 
 	}
 
+	private void Unspam(){
+		waterSpam = false;
+	}
 }

@@ -54,7 +54,26 @@ public class PlayerController : MonoBehaviour {
 			float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
 
 			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
-				rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
+
+				if (statusManager.HasBuff ("Grace")) {
+					statusManager.RemovePowerUp ("Grace");
+				}
+
+				if (metronomeManager.IsOnBeat ()) {
+					metronomeManager.AddStreak ();
+					if (metronomeManager.StreakStatus() >= 4) {
+						metronomeManager.EndStreak ();
+						statusManager.AddPowerUp("Grace");
+						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
+					} else {
+						rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
+					}
+
+				} else {
+					rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
+					metronomeManager.EndStreak ();
+					//statusManager.Kill ();
+				}
 			}
 
 		} else if (statusManager.IsAlive () && !inWater) {
@@ -270,11 +289,19 @@ public class PlayerController : MonoBehaviour {
 	public void ChangeWaterStatus(bool isInWater){
 
 		if (isInWater) {
+			metronomeManager.ShowWaterUI (true);
 			rigidbody.gravityScale = -.2f;
 			rigidbody.drag = 2f;
 		} else {
+			metronomeManager.ShowWaterUI (false);
 			rigidbody.gravityScale = 1.25f;
 			rigidbody.drag = 0f;
+			if (statusManager.HasBuff ("Grace")) {
+				rigidbody.velocity = new Vector2 (0f, 13f);
+				statusManager.RemovePowerUp ("Grace");
+				print ("Graceful exit.");
+				GetComponent<AudioSource> ().Play ();
+			}
 		}
 
 		inWater = isInWater;

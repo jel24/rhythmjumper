@@ -11,6 +11,7 @@ public class MetronomeManager : MonoBehaviour {
 	public MusicManager musicManager;
 	public float errorThreshold;
 	public Image[] streakImages;
+	public Image waterUI;
 	public PlayerStatusManager statusManager;
 	public Vector3 spawnPoint; 
 
@@ -23,6 +24,8 @@ public class MetronomeManager : MonoBehaviour {
 	private int streak;
 	private Color active;
 	private Color inactive;
+	private Color invisible;
+	private Color partial;
 
 	// Use this for initialization
 	void Start () {
@@ -33,6 +36,8 @@ public class MetronomeManager : MonoBehaviour {
 		//Debug.Log(bps);
 		active = new Color(255f, 255f, 255f, 1f);
 		inactive = new Color(255f, 255f, 255f, .25f);
+		invisible = new Color(255f, 255f, 255f, 0f);
+		partial = new Color(255f, 255f, 255f, .5f);
 	}
 
 
@@ -107,5 +112,18 @@ public class MetronomeManager : MonoBehaviour {
 			streakImages [i].color = inactive;
 			statusManager.RemovePowerUp ("Streak");
 		}
+	}
+
+	public void ShowWaterUI(bool show){
+		if (show) {
+			waterUI.color = partial;
+		} else {
+			waterUI.color = invisible;
+		}
+
+	}
+
+	public int StreakStatus(){
+		return streak;
 	}
 }
