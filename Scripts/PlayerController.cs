@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour {
 	private int metronomeCounter;
 	private bool inWater;
 	private ParticleSystem waterFX;
+	private Vector2 waterAddedVelocity;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -51,8 +52,10 @@ public class PlayerController : MonoBehaviour {
 			if (rigidbody.isKinematic = false) {
 				rigidbody.isKinematic = true;
 			}
-
 			float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
+
+
+
 
 			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour {
 					//statusManager.Kill ();
 				}
 			}
+
 
 		} else if (statusManager.IsAlive () && !inWater) {
 			if (rigidbody.isKinematic = false) {
