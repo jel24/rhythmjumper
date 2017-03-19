@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour {
 	public int maxBonusJumps;
 	public MetronomeManager metronomeManager;
 	public bool jumping;
-
+	public ParticleSystem waterPrefab;
 
 	private PlayerStatusManager statusManager;
 	private int jumps;
@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour {
 	private bool feetTouching;
 	private int metronomeCounter;
 	private bool inWater;
+	private ParticleSystem waterFX;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -64,6 +65,7 @@ public class PlayerController : MonoBehaviour {
 					if (metronomeManager.StreakStatus() >= 4) {
 						metronomeManager.EndStreak ();
 						statusManager.AddPowerUp("Grace");
+						Invoke ("RemoveGraceBuff", 1f);
 						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
 					} else {
 						rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
@@ -298,8 +300,12 @@ public class PlayerController : MonoBehaviour {
 			rigidbody.drag = 0f;
 			if (statusManager.HasBuff ("Grace")) {
 				rigidbody.velocity = new Vector2 (0f, 13f);
+				animator.SetTrigger ("grace");
 				statusManager.RemovePowerUp ("Grace");
 				print ("Graceful exit.");
+				waterFX = Instantiate (waterPrefab, gameObject.transform) as ParticleSystem;
+				waterFX.transform.position = transform.position;
+				Invoke ("DestroyWaterParticleSystem", 4f);
 				GetComponent<AudioSource> ().Play ();
 			}
 		}
@@ -308,4 +314,11 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
+	private void DestroyWaterParticleSystem(){
+		Destroy (waterFX);
+	}
+		
+	private void RemoveGraceBuff(){
+		statusManager.RemovePowerUp ("Grace");
+	}
 }
