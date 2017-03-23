@@ -49,8 +49,8 @@ public class PlayerController : MonoBehaviour {
 		prevFrames [0] = inputX;
 
 		if (statusManager.IsAlive () && inWater) {
-			if (rigidbody.isKinematic = false) {
-				rigidbody.isKinematic = true;
+			if (rigidbody.isKinematic) {
+				rigidbody.isKinematic = false;
 			}
 			float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
 
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour {
 						Invoke ("RemoveGraceBuff", 1f);
 						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
 					} else {
-						rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
+						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.25f, inputY * moveSpeed * 1.25f);
 					}
 
 				} else {
@@ -83,8 +83,8 @@ public class PlayerController : MonoBehaviour {
 
 
 		} else if (statusManager.IsAlive () && !inWater) {
-			if (rigidbody.isKinematic = false) {
-				rigidbody.isKinematic = true;
+			if (rigidbody.isKinematic) {
+				rigidbody.isKinematic = false;
 			}
 
 			maxBonusJumps = 1;
@@ -257,9 +257,6 @@ public class PlayerController : MonoBehaviour {
 
 	public void EndTouching (string name)
 	{
-		if (!inWater) {
-
-
 			if (name == "Feet") {
 				animator.SetBool ("jumping", true);
 				jumping = true;
@@ -280,7 +277,6 @@ public class PlayerController : MonoBehaviour {
 				renderer.flipX = true;
 			}
 
-		}
 	}
 
 	private void UsePowerup(){
@@ -298,6 +294,10 @@ public class PlayerController : MonoBehaviour {
 			metronomeManager.ShowWaterUI (true);
 			rigidbody.gravityScale = -.2f;
 			rigidbody.drag = 2f;
+			onWallRight = false;
+			onWallLeft = false;
+			feetTouching = false;
+			headTouching = false;
 		} else {
 			metronomeManager.ShowWaterUI (false);
 			rigidbody.gravityScale = 1.25f;
@@ -324,5 +324,9 @@ public class PlayerController : MonoBehaviour {
 		
 	private void RemoveGraceBuff(){
 		statusManager.RemovePowerUp ("Grace");
+	}
+
+	public bool IsInWater(){
+		return inWater;
 	}
 }

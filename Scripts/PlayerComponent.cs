@@ -13,7 +13,6 @@ public class PlayerComponent : MonoBehaviour {
 	void OnTriggerEnter2D (Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			//Debug.Log(gameObject.name);
 			parent.StartTouching(gameObject.name);
 		}
 	}
@@ -21,7 +20,6 @@ public class PlayerComponent : MonoBehaviour {
 	void OnTriggerExit2D (Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			//Debug.Log(gameObject.name);
 			parent.EndTouching(gameObject.name);
 		}
 	}
@@ -29,7 +27,6 @@ public class PlayerComponent : MonoBehaviour {
 	void OnTriggerStay2D (Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			//Debug.Log(gameObject.name);
 			parent.StartTouching(gameObject.name);
 		}
 	}
@@ -37,30 +34,21 @@ public class PlayerComponent : MonoBehaviour {
 	void OnCollisionEnter2D (Collision2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			//Debug.Log(gameObject.name);
 			parent.StartTouching(gameObject.name);
-			//jumping = false;
-			//animator.SetBool("jumping", false);
 		}
 	}
 
 	void OnCollisionStay2D (Collision2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			//Debug.Log(gameObject.name);
 			parent.StartTouching(gameObject.name);
-			//jumping = false;
-			//animator.SetBool("jumping", false);
 		}
 	}
 
 	void OnCollisionExit2D (Collision2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			//Debug.Log(gameObject.name);
 			parent.EndTouching(gameObject.name);
-			//jumping = false;
-			//animator.SetBool("jumping", false);
 		}
 	}
 }
