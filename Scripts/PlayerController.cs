@@ -10,7 +10,9 @@ public class PlayerController : MonoBehaviour {
 	public int maxBonusJumps;
 	public MetronomeManager metronomeManager;
 	public bool jumping;
-	public ParticleSystem waterPrefab;
+	public ParticleTimer gracePrefab;
+	public ParticleTimer waterPrefab;
+
 
 	private PlayerStatusManager statusManager;
 	private int jumps;
@@ -25,7 +27,6 @@ public class PlayerController : MonoBehaviour {
 	private bool feetTouching;
 	private int metronomeCounter;
 	private bool inWater;
-	private ParticleSystem waterFX;
 	private Vector2 waterAddedVelocity;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
@@ -59,12 +60,23 @@ public class PlayerController : MonoBehaviour {
 
 			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 
+				animator.SetTrigger ("stroke");
+				ParticleTimer waterFX = Instantiate (waterPrefab, gameObject.transform) as ParticleTimer;
+				waterFX.GetComponent<ParticleTimer>().SetExpiration(3f);
+				waterFX.transform.position = transform.position;
+
+				if (inputX > 0) {
+					renderer.flipX = false;
+				} else if (inputX < 0) {
+					renderer.flipX = true;
+				}
+
 				if (statusManager.HasBuff ("Grace")) {
 					statusManager.RemovePowerUp ("Grace");
 				}
 
 				if (metronomeManager.IsOnBeat ()) {
-					metronomeManager.AddStreak ();
+					metronomeManager.AddStreak ();s
 					if (metronomeManager.StreakStatus() >= 4) {
 						metronomeManager.EndStreak ();
 						statusManager.AddPowerUp("Grace");
@@ -298,7 +310,9 @@ public class PlayerController : MonoBehaviour {
 			onWallLeft = false;
 			feetTouching = false;
 			headTouching = false;
+			animator.SetBool ("inWater", true);
 		} else {
+			animator.SetBool ("inWater", false);
 			metronomeManager.ShowWaterUI (false);
 			rigidbody.gravityScale = 1.25f;
 			rigidbody.drag = 0f;
@@ -307,19 +321,15 @@ public class PlayerController : MonoBehaviour {
 				animator.SetTrigger ("grace");
 				statusManager.RemovePowerUp ("Grace");
 				print ("Graceful exit.");
-				waterFX = Instantiate (waterPrefab, gameObject.transform) as ParticleSystem;
+				ParticleTimer waterFX = Instantiate (gracePrefab, gameObject.transform) as ParticleTimer;
+				waterFX.GetComponent<ParticleTimer>().SetExpiration(4f);
 				waterFX.transform.position = transform.position;
-				Invoke ("DestroyWaterParticleSystem", 4f);
 				GetComponent<AudioSource> ().Play ();
 			}
 		}
 
 		inWater = isInWater;
 
-	}
-
-	private void DestroyWaterParticleSystem(){
-		Destroy (waterFX);
 	}
 		
 	private void RemoveGraceBuff(){
