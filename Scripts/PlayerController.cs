@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour {
 				}
 
 				if (metronomeManager.IsOnBeat ()) {
-					metronomeManager.AddStreak ();s
+					metronomeManager.AddStreak ();
 					if (metronomeManager.StreakStatus() >= 4) {
 						metronomeManager.EndStreak ();
 						statusManager.AddPowerUp("Grace");
