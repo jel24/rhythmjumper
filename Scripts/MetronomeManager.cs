@@ -42,10 +42,7 @@ public class MetronomeManager : MonoBehaviour {
 
 
 	public bool IsOnBeat(){
-		if (onBeat) {
-			chime.Play ();
-		}
-		return onBeat;
+		return musicManager.IsOnBeat ();
 	}
 
 	public void changePowerUpStatus (int type, bool onOff)
@@ -62,23 +59,23 @@ public class MetronomeManager : MonoBehaviour {
 		// Debug.Log (1f / bps);
 		if (!reset) {
 			Invoke ("Downbeat", 1f / bps);
-			Invoke ("thresholdOn", (1f / bps) - errorThreshold);
+//			Invoke ("thresholdOn", (1f / bps) - errorThreshold);
 			Beat newBeat = Instantiate(beatPrefab) as Beat; 
 			newBeat.transform.SetParent(canvas.transform);
 			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
 			newBeat.InitiateBeat(300f / (4f / bps));
-			Invoke ("thresholdOff", errorThreshold);
+//			Invoke ("thresholdOff", errorThreshold);
 		}
 		// chime.Play ();
 	}
 
-	private void thresholdOn(){
-		onBeat = true;
-	}
-
-	private void thresholdOff(){
-		onBeat = false;
-	}
+//	private void thresholdOn(){
+//		onBeat = true;
+//	}
+//
+//	private void thresholdOff(){
+//		onBeat = false;
+//	}
 
 	public void Reset(){
 		reset = true;

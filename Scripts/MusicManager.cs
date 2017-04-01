@@ -43,4 +43,25 @@ public class MusicManager : MonoBehaviour {
 		}
 
 	}
+
+	public bool IsOnBeat(){
+		float tempo = metronome.tempo * 1f;
+		float time = audioSource.time;
+		float threshold = metronome.errorThreshold;
+
+		float beatDuration = 60f / tempo;
+
+		print (time % beatDuration);
+
+
+		if ((time % beatDuration <= threshold) || (time % beatDuration) >= (beatDuration - threshold)){
+			print ("On beat!");
+			return true;
+		} else {
+			print ("Not on beat.");
+			return false;
+		}
+
+
+	}
 }
