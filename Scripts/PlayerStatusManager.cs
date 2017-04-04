@@ -9,6 +9,7 @@ public class PlayerStatusManager : MonoBehaviour {
 	public MusicManager musicManager;
 	public MetronomeManager metronomeManager;
 	public CameraController cameraController;
+	public TrailManager trailManager;
 
 	private Animator animator;
 	private bool alive;
@@ -39,6 +40,8 @@ public class PlayerStatusManager : MonoBehaviour {
 			metronomeManager.Reset ();
 			ResetBuffs ();
 			cameraController.SetSizeToDefault ();
+			trailManager.StopTrail ();
+			trailManager.SpawnTrail ();
 		}
 
 	}
