@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
 	public bool jumping;
 	public ParticleTimer gracePrefab;
 	public ParticleTimer waterPrefab;
+	public ParticleTimer splashPrefab;
 
 
 	private PlayerStatusManager statusManager;
@@ -311,6 +312,9 @@ public class PlayerController : MonoBehaviour {
 			feetTouching = false;
 			headTouching = false;
 			animator.SetBool ("inWater", true);
+			ParticleTimer waterFX = Instantiate (splashPrefab) as ParticleTimer;
+			waterFX.GetComponent<ParticleTimer>().SetExpiration(3f);
+			waterFX.transform.position = transform.position;
 		} else {
 			animator.SetBool ("inWater", false);
 			metronomeManager.ShowWaterUI (false);
