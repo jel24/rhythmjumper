@@ -304,6 +304,7 @@ public class PlayerController : MonoBehaviour {
 	public void ChangeWaterStatus(bool isInWater){
 
 		if (isInWater) {
+			bonusJumps = 1;
 			metronomeManager.ShowWaterUI (true);
 			rigidbody.gravityScale = -.2f;
 			rigidbody.drag = 2f;
@@ -315,7 +316,9 @@ public class PlayerController : MonoBehaviour {
 			ParticleTimer waterFX = Instantiate (splashPrefab) as ParticleTimer;
 			waterFX.GetComponent<ParticleTimer>().SetExpiration(3f);
 			waterFX.transform.position = transform.position;
+
 		} else {
+			bonusJumps = 1;
 			animator.SetBool ("inWater", false);
 			metronomeManager.ShowWaterUI (false);
 			rigidbody.gravityScale = 1.25f;
