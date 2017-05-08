@@ -15,6 +15,8 @@ public class PlayerStatusManager : MonoBehaviour {
 	private bool alive;
 	private HashSet<Powerup> powerups;
 	private HashSet<Buff> activeBuffs;
+	private bool[] fragments;
+	private FragmentCounter counter;
 
 	// Use this for initialization
 	void Start ()
@@ -26,6 +28,12 @@ public class PlayerStatusManager : MonoBehaviour {
 			powerups.Add(p);
 		}
 		activeBuffs = new HashSet<Buff>();
+		counter = FindObjectOfType<FragmentCounter> ();
+		if (!counter) {
+			Debug.Log ("Unable to find Fragment Counter.");
+		}
+		fragments = new bool[5] { false, false, false, false, false };
+
 	}
 	
 	public void Kill ()
@@ -60,6 +68,7 @@ public class PlayerStatusManager : MonoBehaviour {
 			p.gameObject.SetActive(true);
 		}
 		metronomeManager.Restart();
+		counter.Reset (fragments);
 	}
 
 	public void StartLevel ()
@@ -145,5 +154,9 @@ public class PlayerStatusManager : MonoBehaviour {
 		metronomeManager.changePowerUpStatus(2, false);
 		metronomeManager.changePowerUpStatus(3, false);
 		activeBuffs.Clear ();
+	}
+
+	public void SaveFragments(bool[] newFragments){
+		fragments = newFragments;
 	}
 }

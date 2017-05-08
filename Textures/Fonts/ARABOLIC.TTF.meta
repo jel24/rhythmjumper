@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 79478946bfdb8fd45a7c76e3249d0ca3
+timeCreated: 1494224577
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Arabolical
+  fontNames:
+  - Arabolical
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
