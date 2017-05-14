@@ -26,6 +26,7 @@ public class MetronomeManager : MonoBehaviour {
 	private Color inactive;
 	private Color invisible;
 	private Color partial;
+	private PowerupManager powerupManager;
 
 	// Use this for initialization
 	void Start () {
@@ -33,7 +34,12 @@ public class MetronomeManager : MonoBehaviour {
 		canvas = this.transform.parent.GetComponent<Canvas>();
 		bps = tempo / 60f;
 		chime = GetComponent<AudioSource> ();
-		//Debug.Log(bps);
+		powerupManager = FindObjectOfType<PowerupManager> ();
+		if (!powerupManager) {
+			Debug.Log ("Unable to find powerup manager!");
+		}
+
+
 		active = new Color(255f, 255f, 255f, 1f);
 		inactive = new Color(255f, 255f, 255f, .25f);
 		invisible = new Color(255f, 255f, 255f, 0f);
@@ -56,26 +62,14 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void Downbeat (){
 		bps = tempo / 60f;
-		// Debug.Log (1f / bps);
 		if (!reset) {
 			Invoke ("Downbeat", 1f / bps);
-//			Invoke ("thresholdOn", (1f / bps) - errorThreshold);
 			Beat newBeat = Instantiate(beatPrefab) as Beat; 
 			newBeat.transform.SetParent(canvas.transform);
 			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
 			newBeat.InitiateBeat(300f / (4f / bps));
-//			Invoke ("thresholdOff", errorThreshold);
 		}
-		// chime.Play ();
 	}
-
-//	private void thresholdOn(){
-//		onBeat = true;
-//	}
-//
-//	private void thresholdOff(){
-//		onBeat = false;
-//	}
 
 	public void Reset(){
 		reset = true;
@@ -97,7 +91,7 @@ public class MetronomeManager : MonoBehaviour {
 			streakImages [2].color = active;
 		} else if (streak == 4) {
 			streakImages [3].color = active;
-			statusManager.AddPowerUp("Streak");
+			powerupManager.AddBuff("Streak");
 		} else if (streak > 4) {
 
 		}
@@ -107,7 +101,7 @@ public class MetronomeManager : MonoBehaviour {
 		streak = 0;
 		for (int i = 0; i < 4; i++) {
 			streakImages [i].color = inactive;
-			statusManager.RemovePowerUp ("Streak");
+			powerupManager.RemoveBuff ("Streak");
 		}
 	}
 

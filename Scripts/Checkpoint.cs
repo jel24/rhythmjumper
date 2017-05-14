@@ -8,6 +8,7 @@ public class Checkpoint : MonoBehaviour {
 
 	private FragmentCounter fragmentCounter;
 	private Camera cam;
+	private PowerupManager powerupManager;
 
 	void Start(){
 		cam = FindObjectOfType<Camera> ();
@@ -17,6 +18,10 @@ public class Checkpoint : MonoBehaviour {
 		fragmentCounter = FindObjectOfType<FragmentCounter> ();
 		if (!fragmentCounter) {
 			Debug.Log ("Unable to find fragment counter!");
+		}
+		powerupManager = FindObjectOfType<PowerupManager> ();
+		if (!powerupManager) {
+			Debug.Log ("Unable to find powerup manager!");		
 		}
 	}
 
@@ -31,7 +36,7 @@ public class Checkpoint : MonoBehaviour {
 			cam.GetComponent<CameraController>().SetDefaultSize (camSize);
 			Debug.Log ("Setting default camera size on " + cam.name + " to " + camSize);
 			coll.gameObject.GetComponentInParent<PlayerStatusManager> ().startLocation = new Vector3 (transform.position.x, transform.position.y, 0f);
-			coll.gameObject.GetComponentInParent<PlayerStatusManager> ().SaveFragments (fragmentCounter.GetFragmentArray ());
+			powerupManager.SaveState ();
 		}
 	}
 }

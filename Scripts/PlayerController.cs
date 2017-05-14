@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 	private int metronomeCounter;
 	private bool inWater;
 	private Vector2 waterAddedVelocity;
+	private PowerupManager powerupManager;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -38,6 +39,11 @@ public class PlayerController : MonoBehaviour {
 		animator = GetComponent<Animator>();
 		renderer = GetComponent<SpriteRenderer>();
 		statusManager = GetComponent<PlayerStatusManager>();
+
+		powerupManager = FindObjectOfType<PowerupManager> ();
+		if (!powerupManager) {
+			Debug.Log ("Unable to find powerup manager!");
+		}
 	}
 	
 	// Update is called once per frame
@@ -72,15 +78,15 @@ public class PlayerController : MonoBehaviour {
 					renderer.flipX = true;
 				}
 
-				if (statusManager.HasBuff ("Grace")) {
-					statusManager.RemovePowerUp ("Grace");
+				if (powerupManager.HasBuff ("Grace")) {
+					powerupManager.RemoveBuff ("Grace");
 				}
 
 				if (metronomeManager.IsOnBeat ()) {
 					metronomeManager.AddStreak ();
 					if (metronomeManager.StreakStatus() >= 4) {
 						metronomeManager.EndStreak ();
-						statusManager.AddPowerUp("Grace");
+						powerupManager.AddBuff("Grace");
 						Invoke ("RemoveGraceBuff", 1f);
 						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
 					} else {
@@ -102,11 +108,11 @@ public class PlayerController : MonoBehaviour {
 
 			maxBonusJumps = 1;
 
-			if (statusManager.HasBuff("Streak")){
+			if (powerupManager.HasBuff("Streak")){
 				maxBonusJumps += 1;
 			} 
 
-			if (statusManager.HasBuff("MetronomeActive")){
+			if (powerupManager.HasBuff("MetronomeActive")){
 				maxBonusJumps = 3;
 			}
 		
@@ -177,20 +183,20 @@ public class PlayerController : MonoBehaviour {
 			if (metronomeManager.IsOnBeat ()) {
 				metronomeManager.AddStreak ();
 
-				if (statusManager.HasBuff ("MetronomeActive")){
+				if (powerupManager.HasBuff ("MetronomeActive")){
 					metronomeCounter++;
 
 					if (metronomeCounter >= 3){
 						print ("Removing Metronome, expired.");
-						statusManager.RemovePowerUp ("MetronomeActive");
+						powerupManager.RemoveBuff ("MetronomeActive");
 					}
 				}
 
 			} else {
 				metronomeManager.EndStreak ();
-				if (statusManager.HasBuff ("MetronomeActive")){
+				if (powerupManager.HasBuff ("MetronomeActive")){
 					print ("Removing Metronome, off beat.");
-					statusManager.RemovePowerUp ("MetronomeActive");
+					powerupManager.RemoveBuff ("MetronomeActive");
 				}
 			}
 
@@ -204,20 +210,20 @@ public class PlayerController : MonoBehaviour {
 			if (metronomeManager.IsOnBeat ()) {
 				metronomeManager.AddStreak ();
 
-				if (statusManager.HasBuff ("MetronomeActive")){
+				if (powerupManager.HasBuff ("MetronomeActive")){
 					metronomeCounter++;
 
 					if (metronomeCounter >= 3){
 						print ("Removing Metronome, expired.");
-						statusManager.RemovePowerUp ("MetronomeActive");
+						powerupManager.RemoveBuff ("MetronomeActive");
 					}
 				}
 
 			} else {
 				metronomeManager.EndStreak ();
-				if (statusManager.HasBuff ("MetronomeActive")){
+				if (powerupManager.HasBuff ("MetronomeActive")){
 					print ("Removing Metronome, off beat.");
-					statusManager.RemovePowerUp ("MetronomeActive");
+					powerupManager.RemoveBuff ("MetronomeActive");
 				}
 			}
 		} else {
@@ -293,10 +299,10 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void UsePowerup(){
-		if (statusManager.HasBuff ("Metronome")) {
+		if (powerupManager.HasBuff ("Metronome")) {
 			metronomeCounter = 0;
-			statusManager.RemovePowerUp ("Metronome");
-			statusManager.AddPowerUp ("MetronomeActive");
+			powerupManager.RemoveBuff ("Metronome");
+			powerupManager.AddBuff ("MetronomeActive");
 			bonusJumps = 3;
 		}
 	}
@@ -323,10 +329,10 @@ public class PlayerController : MonoBehaviour {
 			metronomeManager.ShowWaterUI (false);
 			rigidbody.gravityScale = 1.25f;
 			rigidbody.drag = 0f;
-			if (statusManager.HasBuff ("Grace")) {
+			if (powerupManager.HasBuff ("Grace")) {
 				rigidbody.velocity = new Vector2 (0f, 13f);
 				animator.SetTrigger ("grace");
-				statusManager.RemovePowerUp ("Grace");
+				powerupManager.RemoveBuff ("Grace");
 				print ("Graceful exit.");
 				ParticleTimer waterFX = Instantiate (gracePrefab, gameObject.transform) as ParticleTimer;
 				waterFX.GetComponent<ParticleTimer>().SetExpiration(4f);
@@ -340,7 +346,7 @@ public class PlayerController : MonoBehaviour {
 	}
 		
 	private void RemoveGraceBuff(){
-		statusManager.RemovePowerUp ("Grace");
+		powerupManager.RemoveBuff ("Grace");
 	}
 
 	public bool IsInWater(){
