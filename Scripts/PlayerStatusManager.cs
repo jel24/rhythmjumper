@@ -48,7 +48,6 @@ public class PlayerStatusManager : MonoBehaviour {
 			animator.SetTrigger("death");
 			musicManager.GetComponent<AudioSource>().Stop();
 			metronomeManager.Reset ();
-			powerupManager.LoadState ();
 			cameraController.SetSizeToDefault ();
 			trailManager.StopTrail ();
 			trailManager.SpawnTrail ();
@@ -70,7 +69,7 @@ public class PlayerStatusManager : MonoBehaviour {
 			p.gameObject.SetActive(true);
 		}
 		metronomeManager.Restart();
-		counter.Reset (fragments);
+		powerupManager.LoadState ();
 	}
 
 	public void StartLevel ()

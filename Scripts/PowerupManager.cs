@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PowerupManager : MonoBehaviour {
 
-	private Text text;
+	public Text text;
 	private Dictionary<Powerup, bool> powerUps;
 	private Dictionary<Powerup, bool> savedState;
 
@@ -36,6 +36,12 @@ public class PowerupManager : MonoBehaviour {
 		powerUps [p] = true;
 		p.gameObject.SetActive (false);
 
+		if (p.name.Contains("Metronome")) {
+			AddBuff ("Metronome");
+		} else if (p.name.Contains("Fragment")) {
+			UpdateFragments ();
+		}
+
 	}
 
 	// buffs are represented on the buff bar. powerups create buffs when held
@@ -62,6 +68,16 @@ public class PowerupManager : MonoBehaviour {
 
 	}
 
+	void UpdateFragments(){
+		int count = 0;
+		foreach (Powerup p in powerUps.Keys) {
+			if (p.name.Contains("Fragment")){
+				count++;
+			}
+		}
+		text.text = count + "";
+	}
+
 	public bool HasBuff (string b)
 	{
 		return buffs.Contains (b);
@@ -82,8 +98,10 @@ public class PowerupManager : MonoBehaviour {
 	public void LoadState(){
 		powerUps = new Dictionary<Powerup, bool> ();
 		foreach (Powerup p in savedState.Keys) {
-			powerUps.Add (p, powerUps [p]);
+			powerUps.Add (p, savedState [p]);
 			p.gameObject.SetActive (!savedState[p]);
 		}
+		UpdateFragments ();
+		UpdateBuffs ();
 	}
 }
