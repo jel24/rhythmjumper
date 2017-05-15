@@ -71,7 +71,7 @@ public class PowerupManager : MonoBehaviour {
 	void UpdateFragments(){
 		int count = 0;
 		foreach (Powerup p in powerUps.Keys) {
-			if (p.name.Contains("Fragment")){
+			if (p.name.Contains("Fragment") && powerUps[p]){
 				count++;
 			}
 		}
