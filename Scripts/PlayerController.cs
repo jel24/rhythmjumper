@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour {
 	public ParticleTimer gracePrefab;
 	public ParticleTimer waterPrefab;
 	public ParticleTimer splashPrefab;
-
+	public ParticleTimer phoenixPrefab;
 
 	private PlayerStatusManager statusManager;
 	private int jumps;
@@ -303,6 +303,9 @@ public class PlayerController : MonoBehaviour {
 			metronomeCounter = 0;
 			powerupManager.RemoveBuff ("Metronome");
 			powerupManager.AddBuff ("MetronomeActive");
+			ParticleTimer phoenixFX = Instantiate (phoenixPrefab, gameObject.transform) as ParticleTimer;
+			phoenixFX.GetComponent<ParticleTimer>().SetExpiration(4f);
+			phoenixFX.transform.position = transform.position;
 			bonusJumps = 3;
 		}
 	}
