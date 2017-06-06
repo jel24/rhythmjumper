@@ -62,9 +62,6 @@ public class PlayerController : MonoBehaviour {
 			}
 			float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
 
-
-
-
 			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 
 				animator.SetTrigger ("stroke");
@@ -106,15 +103,15 @@ public class PlayerController : MonoBehaviour {
 				rigidbody.isKinematic = false;
 			}
 
-			maxBonusJumps = 1;
+			maxBonusJumps = 3;
 
-			if (powerupManager.HasBuff("Streak")){
-				maxBonusJumps += 1;
-			} 
+			//if (powerupManager.HasBuff("Streak")){
+				//maxBonusJumps += 1;
+			//} 
 
-			if (powerupManager.HasBuff("MetronomeActive")){
-				maxBonusJumps = 3;
-			}
+			//if (powerupManager.HasBuff("MetronomeActive")){
+				//maxBonusJumps = 3;
+			//}
 		
 			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 				Jump ();
@@ -201,13 +198,13 @@ public class PlayerController : MonoBehaviour {
 			}
 
 		} else if (jumping && bonusJumps > 0) {
-			animator.SetTrigger ("doubleJump");
-			bonusJumps--;
-			Debug.Log (bonusJumps + " jumps left.");
-			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
-			jumpCooldown += jumpCooldownMax;
-
+			
 			if (metronomeManager.IsOnBeat ()) {
+				animator.SetTrigger ("doubleJump");
+				bonusJumps--;
+				Debug.Log (bonusJumps + " jumps left.");
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
+				jumpCooldown += jumpCooldownMax;
 				metronomeManager.AddStreak ();
 
 				if (powerupManager.HasBuff ("MetronomeActive")){

@@ -9,5 +9,7 @@ public class LevelManager : MonoBehaviour {
 		SceneManager.LoadScene (levelName);
 	}
 
-
+	public void Quit(){
+		Application.Quit ();
+	}
 }
