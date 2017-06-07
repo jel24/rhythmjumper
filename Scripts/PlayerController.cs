@@ -8,26 +8,31 @@ public class PlayerController : MonoBehaviour {
 	public float jumpSpeed;
 	public int jumpCooldownMax;
 	public int maxBonusJumps;
-	public MetronomeManager metronomeManager;
+
 	public bool jumping;
 	public ParticleTimer gracePrefab;
 	public ParticleTimer waterPrefab;
 	public ParticleTimer splashPrefab;
 	public ParticleTimer phoenixPrefab;
 
+	private MetronomeManager metronomeManager;
 	private PlayerStatusManager statusManager;
+
 	private int jumps;
 	private int bonusJumps;
+	private int jumpCooldown;
+	private int metronomeCounter;
+
 	private Rigidbody2D rigidbody;
 	private Animator animator;
 	private SpriteRenderer renderer;
-	private int jumpCooldown;
+
 	private bool onWallRight;
 	private bool onWallLeft;
 	private bool headTouching;
 	private bool feetTouching;
-	private int metronomeCounter;
 	private bool inWater;
+
 	private Vector2 waterAddedVelocity;
 	private PowerupManager powerupManager;
 
@@ -39,10 +44,16 @@ public class PlayerController : MonoBehaviour {
 		animator = GetComponent<Animator>();
 		renderer = GetComponent<SpriteRenderer>();
 		statusManager = GetComponent<PlayerStatusManager>();
-
+		if (!statusManager) {
+			Debug.Log ("Unable to find StatusManager!");
+		}
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
 			Debug.Log ("Unable to find powerup manager!");
+		}
+		metronomeManager = FindObjectOfType<MetronomeManager> ();
+		if (!metronomeManager) {
+			Debug.Log ("Unable to find MetronomeManager!");
 		}
 	}
 	
@@ -206,6 +217,10 @@ public class PlayerController : MonoBehaviour {
 				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 				jumpCooldown += jumpCooldownMax;
 				metronomeManager.AddStreak ();
+
+				if (bonusJumps == 0) {
+					metronomeManager.LastJump ();
+				}
 
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					metronomeCounter++;

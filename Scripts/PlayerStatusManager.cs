@@ -7,7 +7,7 @@ public class PlayerStatusManager : MonoBehaviour {
 
 	public Vector3 startLocation;
 	public MusicManager musicManager;
-	public MetronomeManager metronomeManager;
+
 	public CameraController cameraController;
 	public TrailManager trailManager;
 
@@ -15,8 +15,8 @@ public class PlayerStatusManager : MonoBehaviour {
 	private bool alive;
 	private HashSet<Powerup> powerups;
 	private bool[] fragments;
-	private FragmentCounter counter;
 	private PowerupManager powerupManager;
+	private MetronomeManager metronomeManager;
 
 	// Use this for initialization
 	void Start ()
@@ -24,14 +24,14 @@ public class PlayerStatusManager : MonoBehaviour {
 		animator = GetComponent<Animator> ();
 		powerups = new HashSet<Powerup>();
 
-		counter = FindObjectOfType<FragmentCounter> ();
-		if (!counter) {
-			Debug.Log ("Unable to find Fragment Counter.");
-		}
-
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
 			Debug.Log ("Unable to find powerup manager!");		
+		}
+
+		metronomeManager = FindObjectOfType<MetronomeManager> ();
+		if (!metronomeManager) {
+			Debug.Log ("Unable to find metronome manager!");		
 		}
 
 		fragments = new bool[5] { false, false, false, false, false };

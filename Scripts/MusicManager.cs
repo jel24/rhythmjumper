@@ -6,13 +6,18 @@ public class MusicManager : MonoBehaviour {
 
 	public Text countDownText;
 	public GameObject player;
-	public MetronomeManager metronome;
 
+	private MetronomeManager metronome;
 	private AudioSource audioSource;
 	private int timeToStart;
 
 	void Start ()
 	{
+		metronome = FindObjectOfType<MetronomeManager> ();
+		if (!metronome) {
+			Debug.Log ("MusicManager can't find MetronomeManager.");
+		}
+
 		StartMusic();
 		audioSource = GetComponent<AudioSource>();
 	}

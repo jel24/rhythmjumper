@@ -6,16 +6,14 @@ using System.Collections.Generic;
 public class MetronomeManager : MonoBehaviour {
 
 	public float tempo;
-	public Beat beatPrefab;
 	public Image[] powerUpImages;
 	public MusicManager musicManager;
 	public float errorThreshold;
 	public Image[] streakImages;
 	public Image waterUI;
-	public PlayerStatusManager statusManager;
+
 	public Vector3 spawnPoint; 
 
-	private HashSet<Beat> beats;
 	private Canvas canvas;
 	private bool onBeat;
 	private float bps;
@@ -27,17 +25,30 @@ public class MetronomeManager : MonoBehaviour {
 	private Color invisible;
 	private Color partial;
 	private PowerupManager powerupManager;
+	private PlayerCounter playerCounter;
+	private PlayerStatusManager statusManager;
 
 	// Use this for initialization
 	void Start () {
-		beats = new HashSet<Beat>();
 		canvas = this.transform.parent.GetComponent<Canvas>();
 		bps = tempo / 60f;
 		chime = GetComponent<AudioSource> ();
+
+		statusManager = FindObjectOfType<PlayerStatusManager> ();
+		if (!statusManager) {
+			Debug.Log ("Unable to find player status manager!");
+		}
+
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
 			Debug.Log ("Unable to find powerup manager!");
 		}
+
+		playerCounter = FindObjectOfType<PlayerCounter> ();
+		if (!playerCounter) {
+			Debug.Log ("Unable to find player counter!");
+		}
+
 
 
 		active = new Color(255f, 255f, 255f, 1f);
@@ -63,16 +74,14 @@ public class MetronomeManager : MonoBehaviour {
 	public void Downbeat (){
 		bps = tempo / 60f;
 		if (!reset) {
+			UpdatePlayerCounter ();
 			Invoke ("Downbeat", 1f / bps);
-			Beat newBeat = Instantiate(beatPrefab) as Beat; 
-			newBeat.transform.SetParent(canvas.transform);
-			newBeat.GetComponent<RectTransform>().anchoredPosition = spawnPoint;
-			newBeat.InitiateBeat(300f / (4f / bps));
 		}
 	}
 
 	public void Reset(){
 		reset = true;
+		playerCounter.Reset ();
 		EndStreak ();
 	}
 
@@ -99,6 +108,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void EndStreak(){
 		streak = 0;
+		playerCounter.Miss ();
 		for (int i = 0; i < 4; i++) {
 			streakImages [i].color = inactive;
 			powerupManager.RemoveBuff ("Streak");
@@ -116,5 +126,13 @@ public class MetronomeManager : MonoBehaviour {
 
 	public int StreakStatus(){
 		return streak;
+	}
+
+	public void LastJump(){
+		playerCounter.LastJump ();
+	}
+
+	private void UpdatePlayerCounter(){
+		playerCounter.UpdateNumber ();
 	}
 }

@@ -6,7 +6,6 @@ public class Checkpoint : MonoBehaviour {
 
 	public float camSize;
 
-	private FragmentCounter fragmentCounter;
 	private Camera cam;
 	private PowerupManager powerupManager;
 
@@ -14,10 +13,6 @@ public class Checkpoint : MonoBehaviour {
 		cam = FindObjectOfType<Camera> ();
 		if (!cam) {
 			Debug.Log ("Unable to find camera!");
-		}
-		fragmentCounter = FindObjectOfType<FragmentCounter> ();
-		if (!fragmentCounter) {
-			Debug.Log ("Unable to find fragment counter!");
 		}
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
