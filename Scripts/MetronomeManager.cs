@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class MetronomeManager : MonoBehaviour {
 
-	public float tempo;
+	public int tempo;
 	public Image[] powerUpImages;
 	public MusicManager musicManager;
 	public float errorThreshold;
@@ -47,6 +47,8 @@ public class MetronomeManager : MonoBehaviour {
 		playerCounter = FindObjectOfType<PlayerCounter> ();
 		if (!playerCounter) {
 			Debug.Log ("Unable to find player counter!");
+		} else {
+			playerCounter.SetTempo (tempo);
 		}
 
 

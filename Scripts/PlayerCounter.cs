@@ -5,9 +5,13 @@ using UnityEngine.UI;
 
 public class PlayerCounter : MonoBehaviour {
 
+	public Object beatPrefab;
+
 	private Text text;
 	private int counter;
-
+	private int tempo;
+	private Beat[] beats;
+	private Transform parentTransform;
 
 	// Use this for initialization
 	void Start () {
@@ -16,35 +20,49 @@ public class PlayerCounter : MonoBehaviour {
 		if (!text) {
 			Debug.Log ("Cannot find Player Counter text.");
 		}
+		parentTransform = GetComponentInParent<Transform> ();
+		if (!parentTransform) {
+			Debug.Log ("Cannot find Player transform.");
+		}
+		beats = FindObjectsOfType<Beat> ();
+		if (beats.Length != 4) {
+			Debug.Log ("Cannot find 4 beats.");
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		Color currentColor = text.color;
-		text.color = new Color (currentColor.r, currentColor.g, currentColor.b, currentColor.a - 0.04f);
+
+	}
+
+	public void SetTempo(int t){
+		tempo = t;
 	}
 
 	public void UpdateNumber(){
+		Vector3 playerPosition = new Vector3 (100f, 50f, 0f);
 		counter++;
 		if (counter > 4) {
 			counter = 1;
 		}
-		text.text = counter + "";
+		beats[counter-1].transform.position = playerPosition;
+		beats[counter-1].InitializeBeat(tempo, counter);
+
+	//	text.text = counter + "";
 		text.color = Color.white;
 
 	}
 
 	public void Miss(){
-		text.text = "X";
-		text.color = Color.red;
+
 	}
 
 	public void LastJump(){
-		text.text = "!!";
-		text.color = Color.red;
+
 	}
 
 	public void Reset(){
-		counter = 0;
+
 	}
+		
 }
