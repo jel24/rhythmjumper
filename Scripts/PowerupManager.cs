@@ -11,8 +11,14 @@ public class PowerupManager : MonoBehaviour {
 
 	private HashSet<string> buffs;
 	private MetronomeManager metronomeManager;
+	private EndOfLevel ending;
 
 	void Start(){
+		ending = FindObjectOfType<EndOfLevel> ();
+		if (!ending) {
+			Debug.Log ("Unable to find ending!");
+		}
+
 		metronomeManager = FindObjectOfType<MetronomeManager> ();
 		if (!metronomeManager) {
 			Debug.Log ("Unable to find powerup manager!");
@@ -76,6 +82,7 @@ public class PowerupManager : MonoBehaviour {
 			}
 		}
 		text.text = count + "";
+		ending.UpdateFragments (count);
 	}
 
 	public bool HasBuff (string b)

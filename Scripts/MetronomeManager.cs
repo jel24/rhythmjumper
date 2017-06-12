@@ -110,7 +110,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void EndStreak(){
 		streak = 0;
-		playerCounter.Miss ();
+//		playerCounter.Miss ();
 		for (int i = 0; i < 4; i++) {
 			streakImages [i].color = inactive;
 			powerupManager.RemoveBuff ("Streak");
@@ -135,6 +135,6 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	private void UpdatePlayerCounter(){
-		playerCounter.UpdateNumber ();
+		//playerCounter.UpdateNumber ();
 	}
 }
