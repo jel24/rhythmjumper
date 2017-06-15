@@ -7,7 +7,6 @@ public class MetronomeManager : MonoBehaviour {
 
 	public int tempo;
 	public Image[] powerUpImages;
-	public MusicManager musicManager;
 	public float errorThreshold;
 	public Image[] streakImages;
 	public Image waterUI;
@@ -27,6 +26,7 @@ public class MetronomeManager : MonoBehaviour {
 	private PowerupManager powerupManager;
 	private PlayerCounter playerCounter;
 	private PlayerStatusManager statusManager;
+	private MusicManager musicManager;
 
 	// Use this for initialization
 	void Start () {
@@ -42,6 +42,11 @@ public class MetronomeManager : MonoBehaviour {
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
 			Debug.Log ("Unable to find powerup manager!");
+		}
+
+		musicManager = FindObjectOfType<MusicManager> ();
+		if (!musicManager) {
+			Debug.Log ("Unable to find music manager!");
 		}
 
 		playerCounter = FindObjectOfType<PlayerCounter> ();
@@ -66,7 +71,10 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void changePowerUpStatus (int type, bool onOff)
 	{
-		powerUpImages[type].gameObject.SetActive(onOff);
+		if (musicManager.musicLevel) {
+			powerUpImages[type].gameObject.SetActive(onOff);
+		}
+
 	}
 
 	public bool GetPowerUpStatus (int type){
@@ -92,19 +100,21 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	public void AddStreak(){
-		streak++;
+		if (musicManager.musicLevel) {
+			streak++;
 
-		if (streak == 1) {
-			streakImages [0].color = active;
-		} else if (streak == 2) {
-			streakImages [1].color = active;
-		} else if (streak == 3) {
-			streakImages [2].color = active;
-		} else if (streak == 4) {
-			streakImages [3].color = active;
-			powerupManager.AddBuff("Streak");
-		} else if (streak > 4) {
+			if (streak == 1) {
+				streakImages [0].color = active;
+			} else if (streak == 2) {
+				streakImages [1].color = active;
+			} else if (streak == 3) {
+				streakImages [2].color = active;
+			} else if (streak == 4) {
+				streakImages [3].color = active;
+				powerupManager.AddBuff("Streak");
+			} else if (streak > 4) {
 
+			}
 		}
 	}
 
@@ -118,11 +128,14 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	public void ShowWaterUI(bool show){
-		if (show) {
-			waterUI.color = partial;
-		} else {
-			waterUI.color = invisible;
+		if (musicManager.musicLevel) {
+			if (show) {
+				waterUI.color = partial;
+			} else {
+				waterUI.color = invisible;
+			}
 		}
+
 
 	}
 
@@ -131,7 +144,9 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	public void LastJump(){
-		playerCounter.LastJump ();
+		if (musicManager.musicLevel) {
+			playerCounter.LastJump ();
+		}
 	}
 
 	private void UpdatePlayerCounter(){

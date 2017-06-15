@@ -7,15 +7,14 @@ public class CameraController : MonoBehaviour {
 	public GameObject background;
 	public float thresholdX;
 	public float thresholdY;
+	public float targetSize;
+	public float defaultSize;
 
 	private Camera cam;
-	private float targetSize;
-	private float defaultSize;
+
 
 	void Start () {
 		cam = GetComponent<Camera> ();
-		defaultSize = 5.5f;
-		targetSize = 5.5f;
 	}
 
 	// Update is called once per frame

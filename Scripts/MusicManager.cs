@@ -6,6 +6,7 @@ public class MusicManager : MonoBehaviour {
 
 	public Text countDownText;
 	public GameObject player;
+	public bool musicLevel;
 
 	private MetronomeManager metronome;
 	private AudioSource audioSource;
@@ -17,9 +18,15 @@ public class MusicManager : MonoBehaviour {
 		if (!metronome) {
 			Debug.Log ("MusicManager can't find MetronomeManager.");
 		}
-
-		StartMusic();
+			
 		audioSource = GetComponent<AudioSource>();
+
+		if (musicLevel) {
+			StartMusic();
+		} else {
+			audioSource.Play();
+			player.GetComponent<PlayerStatusManager>().StartLevel();
+		}
 	}
 
 	public void StartMusic ()
@@ -30,18 +37,20 @@ public class MusicManager : MonoBehaviour {
 
 	private void CountDown ()
 	{
-		if (timeToStart > 0) {
+
+		if (timeToStart > 0 && musicLevel) {
 			countDownText.text = timeToStart.ToString ();
 			timeToStart--;
 			Invoke ("CountDown", 1f);
-		} else if (timeToStart == 0) {
-			countDownText.text = "Go!";
+		} else if (timeToStart == 0 || !musicLevel) {
+			if (musicLevel) {
+				countDownText.text = "Go!";
+				audioSource.Play();
+				metronome.Downbeat ();
+				Invoke ("CountDown", 1f);
+			}
 			timeToStart--;
-			audioSource.Play();
-			metronome.Downbeat ();
 			player.GetComponent<PlayerStatusManager>().StartLevel();
-			Invoke ("CountDown", 1f);
-
 		} else if (timeToStart < 0) {
 			countDownText.text = "";
 			timeToStart = 3;
@@ -50,23 +59,28 @@ public class MusicManager : MonoBehaviour {
 	}
 
 	public bool IsOnBeat(){
-		float tempo = metronome.tempo * 1f;
-		float time = audioSource.time;
-		float threshold = metronome.errorThreshold;
 
-		float beatDuration = 60f / tempo;
-
-		print (time % beatDuration);
-
-
-		if ((time % beatDuration <= threshold) || (time % beatDuration) >= (beatDuration - threshold)){
-			print ("On beat!");
+		if (!musicLevel) {
 			return true;
 		} else {
-			print ("Not on beat.");
-			return false;
+
+			float tempo = metronome.tempo * 1f;
+			float time = audioSource.time;
+			float threshold = metronome.errorThreshold;
+
+			float beatDuration = 60f / tempo;
+
+			print (time % beatDuration);
+
+
+			if ((time % beatDuration <= threshold) || (time % beatDuration) >= (beatDuration - threshold)) {
+				print ("On beat!");
+				return true;
+			} else {
+				print ("Not on beat.");
+				return false;
+			}
+
 		}
-
-
 	}
 }
