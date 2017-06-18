@@ -350,9 +350,11 @@ public class PlayerController : MonoBehaviour {
 				powerupManager.RemoveBuff ("Grace");
 				print ("Graceful exit.");
 				ParticleTimer waterFX = Instantiate (gracePrefab, gameObject.transform) as ParticleTimer;
-				waterFX.GetComponent<ParticleTimer>().SetExpiration(4f);
+				waterFX.GetComponent<ParticleTimer> ().SetExpiration (4f);
 				waterFX.transform.position = transform.position;
 				GetComponent<AudioSource> ().Play ();
+			} else {
+				rigidbody.AddForce(new Vector2 (0f, 2f));
 			}
 		}
 

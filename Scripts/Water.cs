@@ -15,7 +15,7 @@ public class Water : MonoBehaviour {
 			if (!waterSpam) {
 				GetComponent<AudioSource> ().Play ();
 				waterSpam = true;
-				Invoke ("Unspam", 1f);
+				Invoke ("StopWaterSpam", 1f);
 			}
 		} 
 	}
@@ -28,7 +28,7 @@ public class Water : MonoBehaviour {
 		} 
 	}
 
-	private void Unspam(){
+	private void StopWaterSpam(){
 		waterSpam = false;
 	}
 }

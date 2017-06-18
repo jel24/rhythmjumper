@@ -5,26 +5,34 @@ using UnityEngine.UI;
 
 public class Beat : MonoBehaviour {
 
-	public float distancePerBeat;
-
 	private float speed;
 	private Text text;
+	private float distancePerBeat;
+	private RectTransform rect;
+	private PlayerCounter parent;
 
 	// Use this for initialization
 	void Start () {
 		speed = 0f;
 		text = GetComponent<Text> ();
+		rect = GetComponent<RectTransform> ();
+		distancePerBeat = rect.rect.width;
+		parent = GetComponentInParent<PlayerCounter> ();
 	}
 
 	void Update () {
-		gameObject.transform.Translate(-speed / 60f, 0f, 0f);
+
+		float value = -speed * Time.deltaTime / 60f + (parent.GetAdjustmentValue () / 60f);
+
+		rect.Translate(value, 0f, 0f);
+
 		//Color currentColor = text.color;
 		//text.color = new Color (currentColor.r, currentColor.g, currentColor.b, currentColor.a - 0.04f);
 	}
 
-	// Update is called once per frame
-	public void InitializeBeat(int tempo, int number){
-		speed = (tempo / 60f) * distancePerBeat;
+	public void InitializeBeat(int tempo, int number, Vector2 spawnPos){
+		this.transform.localPosition = spawnPos;
+		speed = tempo / 60f * distancePerBeat; 
 		text.text = number + "";
 	}
 
@@ -35,7 +43,7 @@ public class Beat : MonoBehaviour {
 
 	public void LastJump(){
 	//	text.text = "!!";
-	//	text.color = Color.red;
+	//	text.colo	r = Color.red;
 	}
 
 	public void Reset(){

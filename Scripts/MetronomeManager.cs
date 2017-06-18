@@ -86,17 +86,19 @@ public class MetronomeManager : MonoBehaviour {
 		if (!reset) {
 			UpdatePlayerCounter ();
 			Invoke ("Downbeat", 1f / bps);
+		} else {
+			playerCounter.StartBeats ();
 		}
 	}
 
 	public void Reset(){
 		reset = true;
-		playerCounter.Reset ();
 		EndStreak ();
 	}
 
 	public void Restart(){
 		reset = false;
+		playerCounter.StartBeats ();
 	}
 
 	public void AddStreak(){
@@ -150,6 +152,6 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	private void UpdatePlayerCounter(){
-		//playerCounter.UpdateNumber ();
+		playerCounter.UpdateNumber ();
 	}
 }

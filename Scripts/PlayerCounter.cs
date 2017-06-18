@@ -6,24 +6,27 @@ using UnityEngine.UI;
 public class PlayerCounter : MonoBehaviour {
 
 	public Object beatPrefab;
+	public Vector2 beatSpawnPosition;
 
 	private Text text;
 	private int counter;
 	private int tempo;
 	private Beat[] beats;
-	private Transform parentTransform;
+	private Vector2 playerPos;
+	private Transform playerTransform;
 
 	// Use this for initialization
 	void Start () {
 		counter = 0;
-		text = GetComponentInChildren<Text> ();
+		/*text = GetComponentInChildren<Text> ();
 		if (!text) {
 			Debug.Log ("Cannot find Player Counter text.");
-		}
-		parentTransform = GetComponentInParent<Transform> ();
-		if (!parentTransform) {
+		}*/
+		playerTransform = GetComponentInParent<Transform> ();
+		if (!playerTransform) {
 			Debug.Log ("Cannot find Player transform.");
 		}
+
 		beats = FindObjectsOfType<Beat> ();
 		if (beats.Length != 4) {
 			Debug.Log ("Cannot find 4 beats.");
@@ -32,7 +35,16 @@ public class PlayerCounter : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
+		//transform.position = player.transform.position;
+	}
 
+	public void StartBeats(){
+		int count = 0;
+		foreach (Beat b in beats){
+			count++;
+			b.InitializeBeat (tempo, count, beatSpawnPosition);
+		}
 	}
 
 	public void SetTempo(int t){
@@ -40,16 +52,15 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void UpdateNumber(){
-		Vector3 playerPosition = new Vector3 (100f, 50f, 0f);
 		counter++;
 		if (counter > 4) {
 			counter = 1;
 		}
-		beats[counter-1].transform.position = playerPosition;
-		beats[counter-1].InitializeBeat(tempo, counter);
+		beats[counter-1].transform.localPosition = beatSpawnPosition;
+	//	beats[counter-1].InitializeBeat(tempo, counter);
 
 	//	text.text = counter + "";
-		text.color = Color.white;
+	//	text.color = Color.white;
 
 	}
 
@@ -63,6 +74,10 @@ public class PlayerCounter : MonoBehaviour {
 
 	public void Reset(){
 
+	}
+
+	public float GetAdjustmentValue(){
+		return GetComponentInParent<Rigidbody2D> ().velocity.x;
 	}
 		
 }
