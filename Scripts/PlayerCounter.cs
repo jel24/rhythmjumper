@@ -13,7 +13,6 @@ public class PlayerCounter : MonoBehaviour {
 	private int tempo;
 	private Beat[] beats;
 	private Vector2 playerPos;
-	private Transform playerTransform;
 
 	// Use this for initialization
 	void Start () {
@@ -22,10 +21,6 @@ public class PlayerCounter : MonoBehaviour {
 		if (!text) {
 			Debug.Log ("Cannot find Player Counter text.");
 		}*/
-		playerTransform = GetComponentInParent<Transform> ();
-		if (!playerTransform) {
-			Debug.Log ("Cannot find Player transform.");
-		}
 
 		beats = FindObjectsOfType<Beat> ();
 		if (beats.Length != 4) {
@@ -57,6 +52,7 @@ public class PlayerCounter : MonoBehaviour {
 			counter = 1;
 		}
 		beats[counter-1].transform.localPosition = beatSpawnPosition;
+		beats [counter - 1].Reset ();
 	//	beats[counter-1].InitializeBeat(tempo, counter);
 
 	//	text.text = counter + "";
@@ -65,19 +61,24 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void Miss(){
+		foreach (Beat b in beats){
+			b.Miss();
+		}
+	}
 
+	public void ReturnJumps(){
+		foreach (Beat b in beats){
+			b.ReturnJumps();
+		}
 	}
 
 	public void LastJump(){
-
+		foreach (Beat b in beats){
+			b.LastJump();
+		}
 	}
 
 	public void Reset(){
 
 	}
-
-	public float GetAdjustmentValue(){
-		return GetComponentInParent<Rigidbody2D> ().velocity.x;
-	}
-		
 }

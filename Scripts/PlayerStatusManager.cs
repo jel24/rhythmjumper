@@ -13,7 +13,6 @@ public class PlayerStatusManager : MonoBehaviour {
 	private Animator animator;
 	private bool alive;
 	private HashSet<Powerup> powerups;
-	private bool[] fragments;
 	private PowerupManager powerupManager;
 	private MetronomeManager metronomeManager;
 	private MusicManager musicManager;
@@ -38,10 +37,7 @@ public class PlayerStatusManager : MonoBehaviour {
 		if (!musicManager) {
 			Debug.Log ("Unable to find music manager!");
 		}
-
-
-		fragments = new bool[5] { false, false, false, false, false };
-
+			
 	}
 	
 	public void Kill ()

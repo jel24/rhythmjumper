@@ -13,11 +13,9 @@ public class MetronomeManager : MonoBehaviour {
 
 	public Vector3 spawnPoint; 
 
-	private Canvas canvas;
 	private bool onBeat;
 	private float bps;
 	private bool reset;
-	private AudioSource chime;
 	private int streak;
 	private Color active;
 	private Color inactive;
@@ -30,9 +28,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		canvas = this.transform.parent.GetComponent<Canvas>();
 		bps = tempo / 60f;
-		chime = GetComponent<AudioSource> ();
 
 		statusManager = FindObjectOfType<PlayerStatusManager> ();
 		if (!statusManager) {
@@ -48,7 +44,7 @@ public class MetronomeManager : MonoBehaviour {
 		if (!musicManager) {
 			Debug.Log ("Unable to find music manager!");
 		}
-
+			
 		playerCounter = FindObjectOfType<PlayerCounter> ();
 		if (!playerCounter) {
 			Debug.Log ("Unable to find player counter!");
@@ -98,7 +94,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void Restart(){
 		reset = false;
-		playerCounter.StartBeats ();
+		StartBeats ();
 	}
 
 	public void AddStreak(){
@@ -113,7 +109,7 @@ public class MetronomeManager : MonoBehaviour {
 				streakImages [2].color = active;
 			} else if (streak == 4) {
 				streakImages [3].color = active;
-				powerupManager.AddBuff("Streak");
+				//powerupManager.AddBuff("Streak");
 			} else if (streak > 4) {
 
 			}
@@ -122,7 +118,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void EndStreak(){
 		streak = 0;
-//		playerCounter.Miss ();
+		playerCounter.Miss ();
 		for (int i = 0; i < 4; i++) {
 			streakImages [i].color = inactive;
 			powerupManager.RemoveBuff ("Streak");
@@ -152,6 +148,20 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	private void UpdatePlayerCounter(){
-		playerCounter.UpdateNumber ();
+		if (musicManager.musicLevel) {
+			playerCounter.UpdateNumber ();
+		}
+	}
+
+	public void ReturnJumps(){
+		if (musicManager.musicLevel) {
+			playerCounter.ReturnJumps ();
+		}
+	}
+
+	public void StartBeats(){
+		if (musicManager.musicLevel) {
+			playerCounter.StartBeats ();
+		}
 	}
 }

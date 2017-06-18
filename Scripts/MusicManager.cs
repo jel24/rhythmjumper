@@ -47,6 +47,7 @@ public class MusicManager : MonoBehaviour {
 				countDownText.text = "Go!";
 				audioSource.Play();
 				metronome.Downbeat ();
+				metronome.StartBeats ();
 				Invoke ("CountDown", 1f);
 			}
 			timeToStart--;
@@ -70,7 +71,7 @@ public class MusicManager : MonoBehaviour {
 
 			float beatDuration = 60f / tempo;
 
-			print (time % beatDuration);
+			// print (time % beatDuration);
 
 
 			if ((time % beatDuration <= threshold) || (time % beatDuration) >= (beatDuration - threshold)) {

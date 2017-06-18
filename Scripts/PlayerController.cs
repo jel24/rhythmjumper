@@ -164,10 +164,7 @@ public class PlayerController : MonoBehaviour {
 			}
 
 		}
-
-
-		//rigidbody.velocity = Vector2.ClampMagnitude(rigidbody.velocity, 5f);
-
+			
 	}
 
 	private void Jump ()
@@ -233,6 +230,7 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				metronomeManager.EndStreak ();
+				bonusJumps = 0;
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					print ("Removing Metronome, off beat.");
 					powerupManager.RemoveBuff ("MetronomeActive");
@@ -254,6 +252,7 @@ public class PlayerController : MonoBehaviour {
 				animator.SetBool ("jumping", false);
 				animator.SetBool ("onwall", false);
 				feetTouching = true;
+				metronomeManager.ReturnJumps ();
 			} else if (name == "Head") {
 				headTouching = true;
 			} else if (name == "Left") {
@@ -266,6 +265,8 @@ public class PlayerController : MonoBehaviour {
 				}
 				if (!feetTouching) {
 					animator.SetBool ("onwall", true);
+					metronomeManager.ReturnJumps ();
+
 				}
 				animator.SetBool ("jumping", false);
 				renderer.flipX = true;
@@ -278,6 +279,8 @@ public class PlayerController : MonoBehaviour {
 				}
 				if (!feetTouching) {
 					animator.SetBool ("onwall", true);
+					metronomeManager.ReturnJumps ();
+
 				}
 				animator.SetBool ("jumping", false);
 				renderer.flipX = false;

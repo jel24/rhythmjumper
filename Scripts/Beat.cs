@@ -9,7 +9,11 @@ public class Beat : MonoBehaviour {
 	private Text text;
 	private float distancePerBeat;
 	private RectTransform rect;
-	private PlayerCounter parent;
+	private int lifeTime;
+	private int tempo;
+	private int number;
+	private bool miss;
+	private float opacity;
 
 	// Use this for initialization
 	void Start () {
@@ -17,37 +21,76 @@ public class Beat : MonoBehaviour {
 		text = GetComponent<Text> ();
 		rect = GetComponent<RectTransform> ();
 		distancePerBeat = rect.rect.width;
-		parent = GetComponentInParent<PlayerCounter> ();
+		lifeTime = 0;
+		miss = false;
+		opacity = 0f;
 	}
 
 	void Update () {
-
-		float value = -speed * Time.deltaTime / 60f + (parent.GetAdjustmentValue () / 60f);
-
+		lifeTime++;
+		float value = -speed * Time.deltaTime / 60f;
 		rect.Translate(value, 0f, 0f);
-
-		//Color currentColor = text.color;
-		//text.color = new Color (currentColor.r, currentColor.g, currentColor.b, currentColor.a - 0.04f);
+		UpdateColor ();
 	}
 
-	public void InitializeBeat(int tempo, int number, Vector2 spawnPos){
+	public void InitializeBeat(int newTempo, int newNumber, Vector2 spawnPos){
+		lifeTime = 0;
 		this.transform.localPosition = spawnPos;
-		speed = tempo / 60f * distancePerBeat; 
+		tempo = newTempo;
+		speed = newTempo / 60f * distancePerBeat; 
+		number = newNumber;
 		text.text = number + "";
 	}
 
 	public void Miss(){
-//		text.text = "X";
-//		text.color = Color.red;
+		miss = true;
+		text.text = "X";
+		text.color = new Color (1f, 0f, 0f, opacity);
+	}
+
+	public void ReturnJumps(){
+		miss = false;
+		text.text = number + "";
+		text.color = new Color (1f, 1f, 1f, opacity);
+
 	}
 
 	public void LastJump(){
-	//	text.text = "!!";
-	//	text.colo	r = Color.red;
+		text.color = new Color (1f, .5f, 0f, opacity);
+		miss = true;
 	}
 
 	public void Reset(){
-	//	counter = 0;
+		lifeTime = 0;
+		Color currentColor = text.color;
+		opacity = 0f;
+		text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
+
+	}
+
+	private void UpdateColor(){
+		int framesPerBeat = 0;
+
+		if (tempo != 0) {
+			framesPerBeat = Mathf.RoundToInt (60 / (tempo / 60));
+		}
+			
+		Color currentColor = text.color;
+
+		if (!miss) {
+			if (lifeTime < (tempo / 60f) * framesPerBeat) {
+				opacity += .02f;
+				text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
+			} else {
+				opacity -= .04f;
+				text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
+			}
+		} else {
+			opacity -= .03f;
+			text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
+		}
+
+
 	}
 
 	// 300 units total in 4 beats
