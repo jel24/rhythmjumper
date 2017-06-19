@@ -99,6 +99,7 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void AddStreak(){
 		if (musicManager.musicLevel) {
+			playerCounter.Hit ();
 			streak++;
 
 			if (streak == 1) {

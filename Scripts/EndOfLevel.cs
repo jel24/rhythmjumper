@@ -24,13 +24,14 @@ public class EndOfLevel : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D c){
-		if (c.tag == "Player" && fragmentsOwned >= fragmentsRequired) {
+		//if (c.tag == "Player" && fragmentsOwned >= fragmentsRequired) {
+		if (c.tag == "Player") {
 			levelManager.LoadLevel (targetLevel);
 		}
 	}
 
 	public void UpdateFragments(int number){
 		fragmentsOwned = number;
-		text.text = number + " / " + fragmentsRequired + "";
+		// text.text = number + " / " + fragmentsRequired + "";
 	}
 }

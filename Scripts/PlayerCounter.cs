@@ -17,21 +17,11 @@ public class PlayerCounter : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		counter = 0;
-		/*text = GetComponentInChildren<Text> ();
-		if (!text) {
-			Debug.Log ("Cannot find Player Counter text.");
-		}*/
 
 		beats = FindObjectsOfType<Beat> ();
 		if (beats.Length != 4) {
 			Debug.Log ("Cannot find 4 beats.");
 		}
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-		//transform.position = player.transform.position;
 	}
 
 	public void StartBeats(){
@@ -53,10 +43,6 @@ public class PlayerCounter : MonoBehaviour {
 		}
 		beats[counter-1].transform.localPosition = beatSpawnPosition;
 		beats [counter - 1].Reset ();
-	//	beats[counter-1].InitializeBeat(tempo, counter);
-
-	//	text.text = counter + "";
-	//	text.color = Color.white;
 
 	}
 
@@ -80,5 +66,14 @@ public class PlayerCounter : MonoBehaviour {
 
 	public void Reset(){
 
+	}
+
+	public void Hit(){
+		int current = counter + 3;
+		if (current > 4) {
+			current -= 4;
+		}
+		Debug.Log (current);
+		beats [current-1].Hit ();
 	}
 }

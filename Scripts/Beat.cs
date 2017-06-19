@@ -13,6 +13,7 @@ public class Beat : MonoBehaviour {
 	private int tempo;
 	private int number;
 	private bool miss;
+	private bool hit;
 	private float opacity;
 
 	// Use this for initialization
@@ -28,12 +29,16 @@ public class Beat : MonoBehaviour {
 
 	void Update () {
 		lifeTime++;
-		float value = -speed * Time.deltaTime / 60f;
-		rect.Translate(value, 0f, 0f);
+		if (!hit) {
+			float value = -speed * Time.deltaTime / 60f;
+			rect.Translate(value, 0f, 0f);
+
+		}
 		UpdateColor ();
 	}
 
 	public void InitializeBeat(int newTempo, int newNumber, Vector2 spawnPos){
+		text.fontSize = 48;
 		lifeTime = 0;
 		this.transform.localPosition = spawnPos;
 		tempo = newTempo;
@@ -50,6 +55,7 @@ public class Beat : MonoBehaviour {
 
 	public void ReturnJumps(){
 		miss = false;
+		hit = false;
 		text.text = number + "";
 		text.color = new Color (1f, 1f, 1f, opacity);
 
@@ -60,12 +66,17 @@ public class Beat : MonoBehaviour {
 		miss = true;
 	}
 
+	public void Hit(){
+		hit = true;
+	}
+
 	public void Reset(){
+		text.fontSize = 48;
 		lifeTime = 0;
 		Color currentColor = text.color;
 		opacity = 0f;
 		text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
-
+		hit = false;
 	}
 
 	private void UpdateColor(){
@@ -77,20 +88,27 @@ public class Beat : MonoBehaviour {
 			
 		Color currentColor = text.color;
 
-		if (!miss) {
-			if (lifeTime < (tempo / 60f) * framesPerBeat) {
-				opacity += .02f;
-				text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
-			} else {
-				opacity -= .04f;
-				text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
-			}
-		} else {
-			opacity -= .03f;
-			text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
+		if (hit) {
+			text.fontSize += 3;
+			opacity -= .10f;
 		}
 
+		if (!miss & !hit) {
 
+			if (lifeTime < (tempo / 60f) * framesPerBeat) {
+				opacity += .02f;
+
+			} else {
+				opacity -= .03f;			
+			}
+			
+		} else if (miss) {
+
+				opacity -= .03f;
+
+		}
+
+		text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
 	}
 
 	// 300 units total in 4 beats
