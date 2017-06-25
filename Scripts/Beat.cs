@@ -43,8 +43,9 @@ public class Beat : MonoBehaviour {
 		this.transform.localPosition = spawnPos;
 		tempo = newTempo;
 		speed = newTempo / 60f * distancePerBeat; 
-		number = newNumber;
-		text.text = number + "";
+		//number = newNumber;
+		text.text = "O";
+		//text.text = number + "";
 	}
 
 	public void Miss(){

@@ -10,21 +10,18 @@ public class MetronomeManager : MonoBehaviour {
 	public float errorThreshold;
 	public Image[] streakImages;
 	public Image waterUI;
-
+	public bool musicLevel;
 	public Vector3 spawnPoint; 
 
 	private bool onBeat;
 	private float bps;
-	private bool reset;
 	private int streak;
-	private Color active;
-	private Color inactive;
-	private Color invisible;
-	private Color partial;
+
 	private PowerupManager powerupManager;
 	private PlayerCounter playerCounter;
 	private PlayerStatusManager statusManager;
-	private MusicManager musicManager;
+	private AudioSource audioSource;
+	private PlayerStatusManager playerStatusManager;
 
 	// Use this for initialization
 	void Start () {
@@ -39,38 +36,35 @@ public class MetronomeManager : MonoBehaviour {
 		if (!powerupManager) {
 			Debug.Log ("Unable to find powerup manager!");
 		}
+			
+		playerStatusManager = FindObjectOfType<PlayerStatusManager> ();
+		if (!playerStatusManager) {
+			Debug.Log ("Unable to find player!");
+		}
 
-		musicManager = FindObjectOfType<MusicManager> ();
-		if (!musicManager) {
-			Debug.Log ("Unable to find music manager!");
+		playerCounter = FindObjectOfType<PlayerCounter> ();
+		if (!playerCounter && musicLevel) {
+			Debug.Log ("Unable to find player counter!");
 		}
 			
-		playerCounter = FindObjectOfType<PlayerCounter> ();
-		if (!playerCounter) {
-			Debug.Log ("Unable to find player counter!");
-		} else {
-			playerCounter.SetTempo (tempo);
-		}
+		Invoke ("Begin", 1f);
 
-
-
-		active = new Color(255f, 255f, 255f, 1f);
-		inactive = new Color(255f, 255f, 255f, .25f);
-		invisible = new Color(255f, 255f, 255f, 0f);
-		partial = new Color(255f, 255f, 255f, .5f);
 	}
+		
+	private void Begin(){
+		audioSource = GetComponent<AudioSource>();
+		audioSource.Play();
+		playerStatusManager.StartLevel();
 
-
-	public bool IsOnBeat(){
-		return musicManager.IsOnBeat ();
+		if (musicLevel) {
+			playerCounter.StartBeats (tempo);
+			Downbeat ();
+		}
 	}
 
 	public void changePowerUpStatus (int type, bool onOff)
 	{
-		if (musicManager.musicLevel) {
-			powerUpImages[type].gameObject.SetActive(onOff);
-		}
-
+		powerUpImages[type].gameObject.SetActive(onOff);
 	}
 
 	public bool GetPowerUpStatus (int type){
@@ -79,37 +73,27 @@ public class MetronomeManager : MonoBehaviour {
 
 	public void Downbeat (){
 		bps = tempo / 60f;
-		if (!reset) {
-			UpdatePlayerCounter ();
-			Invoke ("Downbeat", 1f / bps);
-		} else {
-			playerCounter.StartBeats ();
-		}
+		UpdatePlayerCounter ();
+		Invoke ("Downbeat", 1f / bps);
 	}
 
 	public void Reset(){
-		reset = true;
 		EndStreak ();
 	}
 
-	public void Restart(){
-		reset = false;
-		StartBeats ();
-	}
-
 	public void AddStreak(){
-		if (musicManager.musicLevel) {
+		if (musicLevel) {
 			playerCounter.Hit ();
 			streak++;
 
 			if (streak == 1) {
-				streakImages [0].color = active;
+				//streakImages [0].color = active;
 			} else if (streak == 2) {
-				streakImages [1].color = active;
+				//streakImages [1].color = active;
 			} else if (streak == 3) {
-				streakImages [2].color = active;
+				//streakImages [2].color = active;
 			} else if (streak == 4) {
-				streakImages [3].color = active;
+				//streakImages [3].color = active;
 				//powerupManager.AddBuff("Streak");
 			} else if (streak > 4) {
 
@@ -121,20 +105,19 @@ public class MetronomeManager : MonoBehaviour {
 		streak = 0;
 		playerCounter.Miss ();
 		for (int i = 0; i < 4; i++) {
-			streakImages [i].color = inactive;
+			//streakImages [i].color = inactive;
 			powerupManager.RemoveBuff ("Streak");
 		}
 	}
 
 	public void ShowWaterUI(bool show){
-		if (musicManager.musicLevel) {
+		if (musicLevel) {
 			if (show) {
-				waterUI.color = partial;
+				//waterUI.color = partial;
 			} else {
-				waterUI.color = invisible;
+				//waterUI.color = invisible;
 			}
 		}
-
 
 	}
 
@@ -143,26 +126,43 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	public void LastJump(){
-		if (musicManager.musicLevel) {
+		if (musicLevel) {
 			playerCounter.LastJump ();
 		}
 	}
 
 	private void UpdatePlayerCounter(){
-		if (musicManager.musicLevel) {
+		if (musicLevel) {
 			playerCounter.UpdateNumber ();
 		}
 	}
 
 	public void ReturnJumps(){
-		if (musicManager.musicLevel) {
+		if (musicLevel) {
 			playerCounter.ReturnJumps ();
 		}
 	}
+		
+	public bool IsOnBeat(){
 
-	public void StartBeats(){
-		if (musicManager.musicLevel) {
-			playerCounter.StartBeats ();
+		if (!musicLevel) {
+			return true;
+		} else {
+
+			float t = tempo * 1f;
+			float time = audioSource.time;
+			float threshold = errorThreshold;
+
+			float beatDuration = 60f / t;
+
+			if ((time % beatDuration <= threshold) || (time % beatDuration) >= (beatDuration - threshold)) {
+				print ("On beat!");
+				return true;
+			} else {
+				print ("Not on beat.");
+				return false;
+			}
+
 		}
 	}
 }

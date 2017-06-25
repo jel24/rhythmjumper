@@ -15,7 +15,6 @@ public class PlayerStatusManager : MonoBehaviour {
 	private HashSet<Powerup> powerups;
 	private PowerupManager powerupManager;
 	private MetronomeManager metronomeManager;
-	private MusicManager musicManager;
 
 	// Use this for initialization
 	void Start ()
@@ -32,12 +31,8 @@ public class PlayerStatusManager : MonoBehaviour {
 		if (!metronomeManager) {
 			Debug.Log ("Unable to find metronome manager!");		
 		}
-
-		musicManager = FindObjectOfType<MusicManager> ();
-		if (!musicManager) {
-			Debug.Log ("Unable to find music manager!");
-		}
-			
+	
+		alive = false;
 	}
 	
 	public void Kill ()
@@ -48,9 +43,8 @@ public class PlayerStatusManager : MonoBehaviour {
 			alive = false;
 			Invoke("Respawn", 1f);
 			animator.SetTrigger("death");
-			if (musicManager.musicLevel) {
-				musicManager.GetComponent<AudioSource>().Stop();
-				metronomeManager.Reset ();
+			if (metronomeManager.musicLevel) {
+				//metronomeManager.Reset ();
 				trailManager.StopTrail ();
 				trailManager.SpawnTrail ();
 			}
@@ -66,18 +60,17 @@ public class PlayerStatusManager : MonoBehaviour {
 
 	private void Respawn ()
 	{
-		if (musicManager.musicLevel) {
+		if (metronomeManager.musicLevel) {
 
 			foreach (Powerup p in powerups) {
 				p.gameObject.SetActive(true);
 			}
-			metronomeManager.Restart();
 			powerupManager.LoadState ();
 		}
 
-		musicManager.StartMusic ();
 		transform.position = startLocation;
 		animator.SetTrigger ("respawn");
+		StartLevel ();
 
 	}
 

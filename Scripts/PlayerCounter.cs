@@ -17,31 +17,28 @@ public class PlayerCounter : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		counter = 0;
-
+		tempo = 0;
 		beats = FindObjectsOfType<Beat> ();
+
 		if (beats.Length != 4) {
 			Debug.Log ("Cannot find 4 beats.");
 		}
 	}
 
-	public void StartBeats(){
-		int count = 0;
-		foreach (Beat b in beats){
-			count++;
-			b.InitializeBeat (tempo, count, beatSpawnPosition);
+	public void StartBeats(int t){
+		tempo = t;
+		for (int i = 0; i < beats.Length; i++) {
+			beats [i].InitializeBeat (tempo, i, beatSpawnPosition);
 		}
 	}
 
-	public void SetTempo(int t){
-		tempo = t;
-	}
-
 	public void UpdateNumber(){
+
 		counter++;
 		if (counter > 4) {
 			counter = 1;
 		}
-		beats[counter-1].transform.localPosition = beatSpawnPosition;
+		beats [counter - 1].transform.localPosition = beatSpawnPosition;
 		beats [counter - 1].Reset ();
 
 	}
