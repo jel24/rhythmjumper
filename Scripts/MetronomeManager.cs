@@ -47,7 +47,7 @@ public class MetronomeManager : MonoBehaviour {
 			Debug.Log ("Unable to find player counter!");
 		}
 			
-		Invoke ("Begin", 1f);
+		Invoke ("Begin", .5f);
 
 	}
 		

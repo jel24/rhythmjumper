@@ -11,7 +11,7 @@ public class Beat : MonoBehaviour {
 	private RectTransform rect;
 	private int lifeTime;
 	private int tempo;
-	private int number;
+	//private int number;
 	private bool miss;
 	private bool hit;
 	private float opacity;
@@ -57,7 +57,7 @@ public class Beat : MonoBehaviour {
 	public void ReturnJumps(){
 		miss = false;
 		hit = false;
-		text.text = number + "";
+//		text.text = number + "";
 		text.color = new Color (1f, 1f, 1f, opacity);
 
 	}

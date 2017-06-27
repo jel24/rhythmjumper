@@ -78,5 +78,9 @@ public class PlayerStatusManager : MonoBehaviour {
 	{
 		alive = true;
 	}
+
+	public void ToggleActive(){
+		alive = !alive;
+	}
 		
 }
