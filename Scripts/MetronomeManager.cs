@@ -8,8 +8,6 @@ public class MetronomeManager : MonoBehaviour {
 	public int tempo;
 	public Image[] powerUpImages;
 	public float errorThreshold;
-	public Image[] streakImages;
-	public Image waterUI;
 	public bool musicLevel;
 	public Vector3 spawnPoint; 
 
@@ -87,36 +85,26 @@ public class MetronomeManager : MonoBehaviour {
 			streak++;
 
 			if (streak == 1) {
-				//streakImages [0].color = active;
 			} else if (streak == 2) {
-				//streakImages [1].color = active;
 			} else if (streak == 3) {
-				//streakImages [2].color = active;
 			} else if (streak == 4) {
-				//streakImages [3].color = active;
-				//powerupManager.AddBuff("Streak");
 			} else if (streak > 4) {
 
 			}
 		}
 	}
 
-	public void EndStreak(){
+	public void ResetStreak(){
 		streak = 0;
+	}
+
+	public void EndStreak(){
+		ResetStreak ();
 		playerCounter.Miss ();
-		for (int i = 0; i < 4; i++) {
-			//streakImages [i].color = inactive;
-			powerupManager.RemoveBuff ("Streak");
-		}
 	}
 
 	public void ShowWaterUI(bool show){
 		if (musicLevel) {
-			if (show) {
-				//waterUI.color = partial;
-			} else {
-				//waterUI.color = invisible;
-			}
 		}
 
 	}

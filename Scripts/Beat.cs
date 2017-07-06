@@ -55,10 +55,11 @@ public class Beat : MonoBehaviour {
 	}
 
 	public void ReturnJumps(){
-		miss = false;
-		hit = false;
-//		text.text = number + "";
-		text.color = new Color (1f, 1f, 1f, opacity);
+		if (hit != true) {
+			//miss = false;
+			//hit = false;
+			//		text.text = number + "";
+		}
 
 	}
 
@@ -76,8 +77,10 @@ public class Beat : MonoBehaviour {
 		lifeTime = 0;
 		Color currentColor = text.color;
 		opacity = 0f;
-		text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);
+		text.color = new Color (1f, 1f, 1f, 0f);
 		hit = false;
+		miss = false;
+		text.text = "O";
 	}
 
 	private void UpdateColor(){

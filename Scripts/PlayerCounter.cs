@@ -44,9 +44,15 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void Miss(){
-		foreach (Beat b in beats){
-			b.Miss();
+		int current = counter + 3;
+		if (current > 4) {
+			current -= 4;
 		}
+		Debug.Log (current);
+		beats [current-1].Miss ();
+		//foreach (Beat b in beats){
+		//	b.Miss();
+		//}
 	}
 
 	public void ReturnJumps(){

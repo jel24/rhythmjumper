@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour {
 				if (metronomeManager.IsOnBeat ()) {
 					metronomeManager.AddStreak ();
 					if (metronomeManager.StreakStatus() >= 4) {
-						metronomeManager.EndStreak ();
+						metronomeManager.ResetStreak ();
 						powerupManager.AddBuff("Grace");
 						Invoke ("RemoveGraceBuff", 1f);
 						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
@@ -102,9 +102,8 @@ public class PlayerController : MonoBehaviour {
 					}
 
 				} else {
-					rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed);
-					metronomeManager.EndStreak ();
-					//statusManager.Kill ();
+					rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed * .25f);
+					metronomeManager.ResetStreak ();
 				}
 			}
 
@@ -342,6 +341,7 @@ public class PlayerController : MonoBehaviour {
 			ParticleTimer waterFX = Instantiate (splashPrefab) as ParticleTimer;
 			waterFX.GetComponent<ParticleTimer>().SetExpiration(3f);
 			waterFX.transform.position = transform.position;
+			metronomeManager.ReturnJumps ();
 
 		} else {
 			bonusJumps = 1;
