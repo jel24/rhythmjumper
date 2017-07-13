@@ -14,14 +14,33 @@ public class PlayerCounter : MonoBehaviour {
 	private Beat[] beats;
 	private Vector2 playerPos;
 
+	private bool onBeat;
+	private Beat activeBeat;
+	private int streak;
+
 	// Use this for initialization
 	void Start () {
 		counter = 0;
 		tempo = 0;
+		streak = 0;
 		beats = FindObjectsOfType<Beat> ();
-
+		onBeat = false;
 		if (beats.Length != 4) {
 			Debug.Log ("Cannot find 4 beats.");
+		}
+	}
+
+	void OnTriggerEnter2D (Collider2D coll){
+		if (coll.GetComponent<Beat> ()) {
+			Debug.Log ("New beat.");
+			activeBeat = coll.GetComponent<Beat> ();
+			onBeat = true;
+		}
+	}
+
+	void OnTriggerExit2D (Collider2D coll){
+		if (coll.GetComponent<Beat> ()) {
+			onBeat = false;
 		}
 	}
 
@@ -44,39 +63,36 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void Miss(){
-		int current = counter + 3;
-		if (current > 4) {
-			current -= 4;
-		}
-		Debug.Log (current);
-		beats [current-1].Miss ();
-		//foreach (Beat b in beats){
-		//	b.Miss();
-		//}
+		activeBeat.Miss ();
 	}
-
-	public void ReturnJumps(){
-		foreach (Beat b in beats){
-			b.ReturnJumps();
-		}
-	}
-
+		
 	public void LastJump(){
 		foreach (Beat b in beats){
 			b.LastJump();
 		}
 	}
 
-	public void Reset(){
-
-	}
-
 	public void Hit(){
-		int current = counter + 3;
-		if (current > 4) {
-			current -= 4;
-		}
-		Debug.Log (current);
-		beats [current-1].Hit ();
+		activeBeat.Hit ();
+		streak++;
 	}
+
+	public bool IsOnBeat(){
+		return onBeat;
+	}
+		
+
+	public void ResetStreak(){
+		streak = 0;
+	}
+
+	public void EndStreak(){
+		ResetStreak ();
+		Miss ();
+	}
+
+	public int StreakStatus(){
+		return streak;
+	}
+
 }

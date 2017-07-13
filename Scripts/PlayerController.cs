@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour {
 
 	private Vector2 waterAddedVelocity;
 	private PowerupManager powerupManager;
+	private PlayerCounter playerCounter;
 
 	float[] prevFrames = new float[3] {0, 0, 0};
 
@@ -49,11 +50,15 @@ public class PlayerController : MonoBehaviour {
 		}
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
-			Debug.Log ("Unable to find powerup manager!");
+			Debug.Log ("Unable to find PowerupManager!");
 		}
 		metronomeManager = FindObjectOfType<MetronomeManager> ();
 		if (!metronomeManager) {
 			Debug.Log ("Unable to find MetronomeManager!");
+		}
+		playerCounter = FindObjectOfType<PlayerCounter> ();
+		if (!playerCounter) {
+			Debug.Log ("Unable to find PlayerCounter!");
 		}
 	}
 	
@@ -90,10 +95,10 @@ public class PlayerController : MonoBehaviour {
 					powerupManager.RemoveBuff ("Grace");
 				}
 
-				if (metronomeManager.IsOnBeat ()) {
-					metronomeManager.AddStreak ();
-					if (metronomeManager.StreakStatus() >= 4) {
-						metronomeManager.ResetStreak ();
+				if (playerCounter.IsOnBeat ()) {
+					playerCounter.Hit ();
+					if (playerCounter.StreakStatus() >= 4) {
+						playerCounter.ResetStreak ();
 						powerupManager.AddBuff("Grace");
 						Invoke ("RemoveGraceBuff", 1f);
 						rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
@@ -102,8 +107,9 @@ public class PlayerController : MonoBehaviour {
 					}
 
 				} else {
-					rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed * .25f);
-					metronomeManager.ResetStreak ();
+					playerCounter.Miss ();
+					rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed * .50f);
+					playerCounter.ResetStreak ();
 				}
 			}
 
@@ -184,8 +190,8 @@ public class PlayerController : MonoBehaviour {
 				jumpCooldown += jumpCooldownMax;
 			}
 
-			if (metronomeManager.IsOnBeat ()) {
-				metronomeManager.AddStreak ();
+			if (playerCounter.IsOnBeat ()) {
+				playerCounter.Hit ();
 
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					metronomeCounter++;
@@ -197,7 +203,7 @@ public class PlayerController : MonoBehaviour {
 				}
 
 			} else {
-				metronomeManager.EndStreak ();
+				playerCounter.Miss ();
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					print ("Removing Metronome, off beat.");
 					powerupManager.RemoveBuff ("MetronomeActive");
@@ -212,12 +218,12 @@ public class PlayerController : MonoBehaviour {
 			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 			jumpCooldown += jumpCooldownMax;
 
-			if (metronomeManager.IsOnBeat ()) {
+			if (playerCounter.IsOnBeat ()) {
 				Debug.Log ("On beat!");
-				metronomeManager.AddStreak ();
+				playerCounter.Hit ();
 
 				if (bonusJumps == 0) {
-					metronomeManager.LastJump ();
+					playerCounter.LastJump ();
 				}
 
 				if (powerupManager.HasBuff ("MetronomeActive")){
@@ -230,7 +236,7 @@ public class PlayerController : MonoBehaviour {
 				}
 
 			} else {
-				metronomeManager.EndStreak ();
+				playerCounter.Miss ();
 				bonusJumps = 0;
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					print ("Removing Metronome, off beat.");
@@ -253,7 +259,6 @@ public class PlayerController : MonoBehaviour {
 				animator.SetBool ("jumping", false);
 				animator.SetBool ("onwall", false);
 				feetTouching = true;
-				metronomeManager.ReturnJumps ();
 			} else if (name == "Head") {
 				headTouching = true;
 			} else if (name == "Left") {
@@ -266,7 +271,6 @@ public class PlayerController : MonoBehaviour {
 				}
 				if (!feetTouching) {
 					animator.SetBool ("onwall", true);
-					metronomeManager.ReturnJumps ();
 
 				}
 				animator.SetBool ("jumping", false);
@@ -280,7 +284,6 @@ public class PlayerController : MonoBehaviour {
 				}
 				if (!feetTouching) {
 					animator.SetBool ("onwall", true);
-					metronomeManager.ReturnJumps ();
 
 				}
 				animator.SetBool ("jumping", false);
@@ -330,7 +333,6 @@ public class PlayerController : MonoBehaviour {
 
 		if (isInWater) {
 			bonusJumps = 1;
-			metronomeManager.ShowWaterUI (true);
 			rigidbody.gravityScale = -.2f;
 			rigidbody.drag = 2f;
 			onWallRight = false;
@@ -341,12 +343,10 @@ public class PlayerController : MonoBehaviour {
 			ParticleTimer waterFX = Instantiate (splashPrefab) as ParticleTimer;
 			waterFX.GetComponent<ParticleTimer>().SetExpiration(3f);
 			waterFX.transform.position = transform.position;
-			metronomeManager.ReturnJumps ();
 
 		} else {
 			bonusJumps = 1;
 			animator.SetBool ("inWater", false);
-			metronomeManager.ShowWaterUI (false);
 			rigidbody.gravityScale = 1.25f;
 			rigidbody.drag = 0f;
 			if (powerupManager.HasBuff ("Grace")) {

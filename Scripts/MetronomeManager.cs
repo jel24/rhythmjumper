@@ -74,83 +74,10 @@ public class MetronomeManager : MonoBehaviour {
 		UpdatePlayerCounter ();
 		Invoke ("Downbeat", 1f / bps);
 	}
-
-	public void Reset(){
-		EndStreak ();
-	}
-
-	public void AddStreak(){
-		if (musicLevel) {
-			playerCounter.Hit ();
-			streak++;
-
-			if (streak == 1) {
-			} else if (streak == 2) {
-			} else if (streak == 3) {
-			} else if (streak == 4) {
-			} else if (streak > 4) {
-
-			}
-		}
-	}
-
-	public void ResetStreak(){
-		streak = 0;
-	}
-
-	public void EndStreak(){
-		ResetStreak ();
-		playerCounter.Miss ();
-	}
-
-	public void ShowWaterUI(bool show){
-		if (musicLevel) {
-		}
-
-	}
-
-	public int StreakStatus(){
-		return streak;
-	}
-
-	public void LastJump(){
-		if (musicLevel) {
-			playerCounter.LastJump ();
-		}
-	}
-
+		
 	private void UpdatePlayerCounter(){
 		if (musicLevel) {
 			playerCounter.UpdateNumber ();
-		}
-	}
-
-	public void ReturnJumps(){
-		if (musicLevel) {
-			playerCounter.ReturnJumps ();
-		}
-	}
-		
-	public bool IsOnBeat(){
-
-		if (!musicLevel) {
-			return true;
-		} else {
-
-			float t = tempo * 1f;
-			float time = audioSource.time;
-			float threshold = errorThreshold;
-
-			float beatDuration = 60f / t;
-
-			if ((time % beatDuration <= threshold) || (time % beatDuration) >= (beatDuration - threshold)) {
-				print ("On beat!");
-				return true;
-			} else {
-				print ("Not on beat.");
-				return false;
-			}
-
 		}
 	}
 }

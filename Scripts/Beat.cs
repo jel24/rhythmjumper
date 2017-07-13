@@ -53,16 +53,7 @@ public class Beat : MonoBehaviour {
 		text.text = "X";
 		text.color = new Color (1f, 0f, 0f, opacity);
 	}
-
-	public void ReturnJumps(){
-		if (hit != true) {
-			//miss = false;
-			//hit = false;
-			//		text.text = number + "";
-		}
-
-	}
-
+		
 	public void LastJump(){
 		text.color = new Color (1f, .5f, 0f, opacity);
 		miss = true;
