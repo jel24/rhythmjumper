@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class PlayerCounter : MonoBehaviour {
 
-	public Object beatPrefab;
 	public Vector2 beatSpawnPosition;
 
 	private Text text;
@@ -63,7 +62,9 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void Miss(){
-		activeBeat.Miss ();
+		if (activeBeat) {
+			activeBeat.Miss ();
+		}
 	}
 		
 	public void LastJump(){
