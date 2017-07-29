@@ -8,12 +8,18 @@ public class PlayerController : MonoBehaviour {
 	public float jumpSpeed;
 	public int jumpCooldownMax;
 	public int maxBonusJumps;
+	public AudioClip waterSound;
+	public AudioClip missSound;
+	public AudioClip hitSound;
+
 
 	public bool jumping;
 	public ParticleTimer gracePrefab;
 	public ParticleTimer waterPrefab;
 	public ParticleTimer splashPrefab;
 	public ParticleTimer phoenixPrefab;
+	public ParticleTimer positivePrefab;
+	public ParticleTimer negativePrefab;
 
 	private MetronomeManager metronomeManager;
 	private PlayerStatusManager statusManager;
@@ -26,6 +32,7 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody2D rigidbody;
 	private Animator animator;
 	private SpriteRenderer renderer;
+	private AudioSource audioSource;
 
 	private bool onWallRight;
 	private bool onWallLeft;
@@ -45,6 +52,7 @@ public class PlayerController : MonoBehaviour {
 		animator = GetComponent<Animator>();
 		renderer = GetComponent<SpriteRenderer>();
 		statusManager = GetComponent<PlayerStatusManager>();
+		audioSource = GetComponent<AudioSource> ();
 		if (!statusManager) {
 			Debug.Log ("Unable to find StatusManager!");
 		}
@@ -221,6 +229,14 @@ public class PlayerController : MonoBehaviour {
 			if (playerCounter.IsOnBeat ()) {
 				Debug.Log ("On beat!");
 				playerCounter.Hit ();
+				//Display positive particles
+				ParticleTimer jumpFX = Instantiate (positivePrefab) as ParticleTimer;
+				jumpFX.GetComponent<ParticleTimer>().SetExpiration(3f);
+				jumpFX.transform.position = transform.position;
+				//
+
+				audioSource.clip = hitSound;
+				audioSource.Play ();
 
 				if (bonusJumps == 0) {
 					playerCounter.LastJump ();
@@ -237,6 +253,15 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				playerCounter.Miss ();
+				// Display negative particles
+				ParticleTimer jumpFX = Instantiate (negativePrefab) as ParticleTimer;
+				jumpFX.GetComponent<ParticleTimer>().SetExpiration(3f);
+				jumpFX.transform.position = transform.position;
+				//
+
+				audioSource.clip = missSound;
+				audioSource.Play ();
+
 				bonusJumps = 0;
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					print ("Removing Metronome, off beat.");
@@ -321,11 +346,13 @@ public class PlayerController : MonoBehaviour {
 		if (powerupManager.HasBuff ("Metronome")) {
 			metronomeCounter = 0;
 			powerupManager.RemoveBuff ("Metronome");
-			powerupManager.AddBuff ("MetronomeActive");
+
 			ParticleTimer phoenixFX = Instantiate (phoenixPrefab, gameObject.transform) as ParticleTimer;
 			phoenixFX.GetComponent<ParticleTimer>().SetExpiration(4f);
 			phoenixFX.transform.position = transform.position;
 			bonusJumps = 3;
+			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * 2f);
+
 		}
 	}
 
@@ -357,6 +384,7 @@ public class PlayerController : MonoBehaviour {
 				ParticleTimer waterFX = Instantiate (gracePrefab, gameObject.transform) as ParticleTimer;
 				waterFX.GetComponent<ParticleTimer> ().SetExpiration (4f);
 				waterFX.transform.position = transform.position;
+				GetComponent<AudioSource> ().clip = waterSound;
 				GetComponent<AudioSource> ().Play ();
 			} else {
 				rigidbody.AddForce(new Vector2 (0f, 2f));

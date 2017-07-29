@@ -31,7 +31,7 @@ public class PlayerCounter : MonoBehaviour {
 
 	void OnTriggerEnter2D (Collider2D coll){
 		if (coll.GetComponent<Beat> ()) {
-			Debug.Log ("New beat.");
+			//Debug.Log ("New beat.");
 			activeBeat = coll.GetComponent<Beat> ();
 			onBeat = true;
 		}
