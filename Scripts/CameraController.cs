@@ -18,7 +18,7 @@ public class CameraController : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update ()
+	void LateUpdate ()
 	{
 		float transformX = 0f;
 		float transformY = 0f;
