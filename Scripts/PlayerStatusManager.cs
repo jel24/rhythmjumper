@@ -7,14 +7,15 @@ public class PlayerStatusManager : MonoBehaviour {
 
 	public Vector3 startLocation;
 
-	public CameraController cameraController;
-	public TrailManager trailManager;
 
 	private Animator animator;
 	private bool alive;
 	private HashSet<Powerup> powerups;
 	private PowerupManager powerupManager;
 	private MetronomeManager metronomeManager;
+	private TrailManager trailManager;
+	private CameraController cameraController;
+
 
 	// Use this for initialization
 	void Start ()
@@ -32,6 +33,16 @@ public class PlayerStatusManager : MonoBehaviour {
 			Debug.Log ("Unable to find metronome manager!");		
 		}
 	
+		trailManager = FindObjectOfType<TrailManager> ();
+		if (!trailManager) {
+			Debug.Log ("Unable to find trail manager!");		
+		}
+
+		cameraController = FindObjectOfType<CameraController> ();
+		if (!cameraController) {
+			Debug.Log ("Unable to find camera controller!");		
+		}
+
 		alive = false;
 	}
 	

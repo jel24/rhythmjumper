@@ -9,12 +9,13 @@ public class Beat : MonoBehaviour {
 	private Text text;
 	private float distancePerBeat;
 	private RectTransform rect;
-	private int lifeTime;
 	private int tempo;
 	//private int number;
 	private bool miss;
 	private bool hit;
+	private bool fade;
 	private float opacity;
+	private int framesPerBeat;
 
 	// Use this for initialization
 	void Start () {
@@ -22,30 +23,29 @@ public class Beat : MonoBehaviour {
 		text = GetComponent<Text> ();
 		rect = GetComponent<RectTransform> ();
 		distancePerBeat = rect.rect.width;
-		lifeTime = 0;
 		miss = false;
 		opacity = 0f;
 	}
 
 	void Update () {
-		lifeTime++;
-		if (!hit) {
-			float value = -speed * Time.deltaTime / 60f;
-			rect.Translate(value, 0f, 0f);
-
-		}
+		float value = -speed * Time.deltaTime / 60f;
+		rect.Translate (value, 0f, 0f);
 		UpdateColor ();
 	}
 
 	public void InitializeBeat(int newTempo, int newNumber, Vector2 spawnPos){
 		text.fontSize = 48;
-		lifeTime = 0;
 		this.transform.localPosition = spawnPos;
 		tempo = newTempo;
 		speed = newTempo / 60f * distancePerBeat; 
 		//number = newNumber;
 		text.text = "O";
 		//text.text = number + "";
+
+		if (tempo != 0) {
+			framesPerBeat = Mathf.RoundToInt (60 / (tempo / 60));
+		}
+
 	}
 
 	public void Miss(){
@@ -56,50 +56,44 @@ public class Beat : MonoBehaviour {
 		
 	public void LastJump(){
 		text.color = new Color (1f, .5f, 0f, opacity);
-		miss = true;
+		text.text = "!";
+		//miss = true;
 	}
 
 	public void Hit(){
 		hit = true;
 	}
 
+	public bool BeatHitBefore(){
+		return hit || miss;
+	}
+
+	public void StartFade(){
+		fade = true;
+	}
+
 	public void Reset(){
 		text.fontSize = 48;
-		lifeTime = 0;
 		Color currentColor = text.color;
 		opacity = 0f;
 		text.color = new Color (1f, 1f, 1f, 0f);
 		hit = false;
 		miss = false;
 		text.text = "O";
+		fade = false;
 	}
 
 	private void UpdateColor(){
-		int framesPerBeat = 0;
 
-		if (tempo != 0) {
-			framesPerBeat = Mathf.RoundToInt (60 / (tempo / 60));
-		}
-			
 		Color currentColor = text.color;
 
 		if (hit) {
 			text.fontSize += 3;
 			opacity -= .10f;
-		}
-
-		if (!miss & !hit) {
-
-			if (lifeTime < (tempo / 60f) * framesPerBeat) {
-				opacity += .02f;
-
-			} else {
-				opacity -= .03f;			
-			}
-			
-		} else if (miss) {
-
-				opacity -= .03f;
+		} else if (fade) {
+			opacity -= .03f;
+		} else {
+			opacity += .03f;
 
 		}
 

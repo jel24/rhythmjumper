@@ -40,6 +40,7 @@ public class PlayerCounter : MonoBehaviour {
 	void OnTriggerExit2D (Collider2D coll){
 		if (coll.GetComponent<Beat> ()) {
 			onBeat = false;
+			coll.GetComponent<Beat>().StartFade ();
 		}
 	}
 
@@ -48,6 +49,10 @@ public class PlayerCounter : MonoBehaviour {
 		for (int i = 0; i < beats.Length; i++) {
 			beats [i].InitializeBeat (tempo, i, beatSpawnPosition);
 		}
+	}
+
+	public bool ActiveBeatHitBefore() {
+		return activeBeat.BeatHitBefore ();
 	}
 
 	public void UpdateNumber(){
@@ -62,15 +67,18 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void Miss(){
-		if (activeBeat) {
-			activeBeat.Miss ();
+		int targetBeat = counter-2;
+		print (targetBeat);
+		if (targetBeat > 4) {
+			targetBeat -= 4;
+		} else if (targetBeat < 0) {
+			targetBeat += 4;
 		}
+		beats [targetBeat].Miss ();
 	}
 		
 	public void LastJump(){
-		foreach (Beat b in beats){
-			b.LastJump();
-		}
+		activeBeat.LastJump();
 	}
 
 	public void Hit(){

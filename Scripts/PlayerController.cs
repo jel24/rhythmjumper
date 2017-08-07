@@ -129,13 +129,6 @@ public class PlayerController : MonoBehaviour {
 
 			maxBonusJumps = 3;
 
-			//if (powerupManager.HasBuff("Streak")){
-				//maxBonusJumps += 1;
-			//} 
-
-			//if (powerupManager.HasBuff("MetronomeActive")){
-				//maxBonusJumps = 3;
-			//}
 		
 			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 				Jump ();
@@ -212,10 +205,6 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				playerCounter.Miss ();
-				if (powerupManager.HasBuff ("MetronomeActive")){
-					print ("Removing Metronome, off beat.");
-					powerupManager.RemoveBuff ("MetronomeActive");
-				}
 			}
 
 		} else if (jumping && bonusJumps > 0) {
@@ -223,10 +212,11 @@ public class PlayerController : MonoBehaviour {
 			animator.SetTrigger ("doubleJump");
 			bonusJumps--;
 			Debug.Log (bonusJumps + " jumps left.");
-			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
-			jumpCooldown += jumpCooldownMax;
 
-			if (playerCounter.IsOnBeat ()) {
+
+			if (playerCounter.IsOnBeat () && !playerCounter.ActiveBeatHitBefore()) {
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
+				jumpCooldown += jumpCooldownMax;
 				Debug.Log ("On beat!");
 				playerCounter.Hit ();
 				//Display positive particles
@@ -252,6 +242,8 @@ public class PlayerController : MonoBehaviour {
 				}
 
 			} else {
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .7f, jumpSpeed * .3f);
+				jumpCooldown += jumpCooldownMax;
 				playerCounter.Miss ();
 				// Display negative particles
 				ParticleTimer jumpFX = Instantiate (negativePrefab) as ParticleTimer;
@@ -262,11 +254,6 @@ public class PlayerController : MonoBehaviour {
 				audioSource.clip = missSound;
 				audioSource.Play ();
 
-				bonusJumps = 0;
-				if (powerupManager.HasBuff ("MetronomeActive")){
-					print ("Removing Metronome, off beat.");
-					powerupManager.RemoveBuff ("MetronomeActive");
-				}
 			}
 		} else {
 			Debug.Log ("Out of jumps!");
