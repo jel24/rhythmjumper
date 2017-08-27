@@ -16,6 +16,7 @@ public class PlayerCounter : MonoBehaviour {
 	private bool onBeat;
 	private Beat activeBeat;
 	private int streak;
+	private JumpTypeManager jumpTypeManager;
 
 	// Use this for initialization
 	void Start () {
@@ -24,8 +25,13 @@ public class PlayerCounter : MonoBehaviour {
 		streak = 0;
 		beats = FindObjectsOfType<Beat> ();
 		onBeat = false;
-		if (beats.Length != 4) {
-			Debug.Log ("Cannot find 4 beats.");
+		if (beats.Length != 8) {
+			Debug.Log ("Cannot find 8 beats.");
+		}
+		jumpTypeManager = FindObjectOfType<JumpTypeManager> ();
+		if (!jumpTypeManager) {
+			Debug.Log ("Cannot find Jump Type Manager.");
+
 		}
 	}
 
@@ -58,7 +64,7 @@ public class PlayerCounter : MonoBehaviour {
 	public void UpdateNumber(){
 
 		counter++;
-		if (counter > 4) {
+		if (counter > 8) {
 			counter = 1;
 		}
 		beats [counter - 1].transform.localPosition = beatSpawnPosition;
@@ -69,10 +75,10 @@ public class PlayerCounter : MonoBehaviour {
 	public void Miss(){
 		int targetBeat = counter-2;
 		print (targetBeat);
-		if (targetBeat > 4) {
-			targetBeat -= 4;
+		if (targetBeat > 8) {
+			targetBeat -= 8;
 		} else if (targetBeat < 0) {
-			targetBeat += 4;
+			targetBeat += 8;
 		}
 		beats [targetBeat].Miss ();
 	}
@@ -102,6 +108,43 @@ public class PlayerCounter : MonoBehaviour {
 
 	public int StreakStatus(){
 		return streak;
+	}
+
+	public void UpdateBeatDisplayForJumpType(JumpType newType){
+		switch (newType) {
+		case JumpType.Eighth:
+			foreach (Beat b in beats) {
+				b.UpdateForJumpType (true);
+			}
+			break;
+		case JumpType.Quarter:
+			for (int i = 0; i < beats.Length; i++) {
+				if (i % 2 == 0) {
+					beats[i].UpdateForJumpType (true);
+				} else {
+					beats[i].UpdateForJumpType (false);
+				}
+			}
+			break;
+		case JumpType.Half:
+			for (int i = 0; i < beats.Length; i++) {
+				if (i % 4 == 0) {
+					beats [i].UpdateForJumpType (true);
+				} else {
+					beats [i].UpdateForJumpType (false);
+				}
+			}
+			break;
+		case JumpType.Whole:
+				for (int i = 0; i < beats.Length; i++) {
+					if (i % 8 == 0) {
+						beats[i].UpdateForJumpType (true);
+					} else {
+						beats[i].UpdateForJumpType (false);
+					}
+				}
+			break;
+		}
 	}
 
 }

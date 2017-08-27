@@ -56,7 +56,9 @@ public class MetronomeManager : MonoBehaviour {
 
 		if (musicLevel) {
 			playerCounter.StartBeats (tempo);
-			Downbeat ();
+			bps = tempo / 60f;
+			InvokeRepeating ("Downbeat", 1f / bps, 1f / bps);
+			InvokeRepeating ("Upbeat", 1f / bps / 2, 1f / bps / 2);
 		}
 	}
 
@@ -70,9 +72,11 @@ public class MetronomeManager : MonoBehaviour {
 	}
 
 	public void Downbeat (){
-		bps = tempo / 60f;
 		UpdatePlayerCounter ();
-		Invoke ("Downbeat", 1f / bps);
+	}
+
+	public void Upbeat () {
+		UpdatePlayerCounter ();
 	}
 		
 	private void UpdatePlayerCounter(){

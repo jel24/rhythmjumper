@@ -16,6 +16,7 @@ public class Beat : MonoBehaviour {
 	private bool fade;
 	private float opacity;
 	private int framesPerBeat;
+	private bool activeForJumpType;
 
 	// Use this for initialization
 	void Start () {
@@ -31,6 +32,10 @@ public class Beat : MonoBehaviour {
 		float value = -speed * Time.deltaTime / 60f;
 		rect.Translate (value, 0f, 0f);
 		UpdateColor ();
+	}
+
+	public void UpdateForJumpType(bool showing){
+		activeForJumpType = showing;
 	}
 
 	public void InitializeBeat(int newTempo, int newNumber, Vector2 spawnPos){
@@ -90,7 +95,7 @@ public class Beat : MonoBehaviour {
 		if (hit) {
 			text.fontSize += 3;
 			opacity -= .10f;
-		} else if (fade) {
+		} else if (fade || !activeForJumpType) {
 			opacity -= .03f;
 		} else {
 			opacity += .03f;
