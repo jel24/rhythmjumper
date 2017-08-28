@@ -77,7 +77,6 @@ public class JumpTypeManager : MonoBehaviour {
 			newPos = typeList.Count - 1;
 		}
 			
-		print (typeList[newPos]);
 		SetCurrentType(typeList [newPos]);
 		return typeList [newPos];
 	}
@@ -107,6 +106,7 @@ public class JumpTypeManager : MonoBehaviour {
 	private void SetCurrentType(JumpType newType){
 		currentType = newType;
 		counter.UpdateBeatDisplayForJumpType (newType);
+		UpdateActiveDisplay ();
 
 	}
 
@@ -116,27 +116,60 @@ public class JumpTypeManager : MonoBehaviour {
 
 	private void UpdateDisplayPositions(){
 
+
+			Image[] children = GetComponentsInChildren<Image> ();
+
+			switch (typeList.Count) {
+			case 1: 
+				children [1].rectTransform.anchoredPosition = new Vector2 (0f, 0f);
+				break;
+			case 2:
+				children [1].rectTransform.anchoredPosition = new Vector2 (-2f, 0f);
+				children [2].rectTransform.anchoredPosition = new Vector2 (2f, 0f);
+				break;
+			case 3:
+				children [1].rectTransform.anchoredPosition = new Vector2 (-4f, 0f);
+				children [2].rectTransform.anchoredPosition = new Vector2 (0f, 0f);
+				children [3].rectTransform.anchoredPosition = new Vector2 (4f, 0f);
+				break;
+			case 4:		
+				children [1].rectTransform.anchoredPosition = new Vector2 (-6f, 0f);
+				children [2].rectTransform.anchoredPosition = new Vector2 (-2f, 0f);
+				children [3].rectTransform.anchoredPosition = new Vector2 (2f, 0f);
+				children [4].rectTransform.anchoredPosition = new Vector2 (6f, 0f);
+				break;
+			}
+
+	}
+
+	private void UpdateActiveDisplay(){
 		Image[] children = GetComponentsInChildren<Image> ();
 
-		switch (typeList.Count) {
-		case 1: 
-			children [1].rectTransform.anchoredPosition = new Vector2 (0f, 0f);
-			break;
-		case 2:
-			children [1].rectTransform.anchoredPosition = new Vector2 (-2f, 0f);
-			children [2].rectTransform.anchoredPosition = new Vector2 (2f, 0f);
-			break;
-		case 3:
-			children [1].rectTransform.anchoredPosition = new Vector2 (-4f, 0f);
-			children [2].rectTransform.anchoredPosition = new Vector2 (0f, 0f);
-			children [3].rectTransform.anchoredPosition = new Vector2 (4f, 0f);
-			break;
-		case 4:		
-			children [1].rectTransform.anchoredPosition = new Vector2 (-6f, 0f);
-			children [2].rectTransform.anchoredPosition = new Vector2 (-2f, 0f);
-			children [3].rectTransform.anchoredPosition = new Vector2 (2f, 0f);
-			children [4].rectTransform.anchoredPosition = new Vector2 (6f, 0f);
-			break;
+		for (int i = 1; i < children.Length; i++) {
+			children [i].color = Color.white;
 		}
+
+		if (typeList.Count == 4) {
+			print ("in switch");
+			switch (currentType) {
+			case JumpType.Eighth:
+				children [1].color = Color.red;
+				break;
+			case JumpType.Quarter:
+				children [2].color = Color.red;
+
+				break;
+			case JumpType.Half:
+				children [3].color = Color.red;
+
+				break;
+			case JumpType.Whole:
+				children [4].color = Color.red;
+
+				break;
+			}
+		}
+
+
 	}
 }

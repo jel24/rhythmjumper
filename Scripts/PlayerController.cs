@@ -156,11 +156,11 @@ public class PlayerController : MonoBehaviour {
 		if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 			Jump ();
 		}
-		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft")) {
+		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft") && !jumping) {
 			jumpTypeManager.SwapLeft ();
 		}
 
-		if (CrossPlatformInputManager.GetButtonDown ("SwapRight")) {
+		if (CrossPlatformInputManager.GetButtonDown ("SwapRight") && !jumping) {
 			jumpTypeManager.SwapRight ();
 		}
 
@@ -312,10 +312,30 @@ public class PlayerController : MonoBehaviour {
 	public void StartTouching (string name)
 	{
 		if (!inWater) {
-			
+			JumpType j = jumpTypeManager.getJumpType ();
+			int refreshJumps = 0;
+
+			switch (j) {
+			case JumpType.Eighth:
+				refreshJumps = 7;
+				break;
+			case JumpType.Quarter:
+				refreshJumps = 3;
+				break;
+			case JumpType.Half:
+				refreshJumps = 1;
+				break;
+			case JumpType.Whole:
+				refreshJumps = 0;
+				break;
+			default:
+				print ("No jump types available.");
+				break;
+			}
+
 			if (name == "Feet") {
 				jumping = false;
-				bonusJumps = maxBonusJumps;
+				bonusJumps = refreshJumps;
 				animator.SetBool ("jumping", false);
 				animator.SetBool ("onwall", false);
 				feetTouching = true;
@@ -325,7 +345,7 @@ public class PlayerController : MonoBehaviour {
 				onWallLeft = true;
 				jumping = false;
 				if (!headTouching) {
-					bonusJumps = maxBonusJumps;
+					bonusJumps = refreshJumps;
 					//Debug.Log("Resetting jumps LEFT.");
 
 				}
@@ -339,7 +359,7 @@ public class PlayerController : MonoBehaviour {
 				onWallRight = true;
 				jumping = false;
 				if (!headTouching) {
-					bonusJumps = maxBonusJumps;
+					bonusJumps = refreshJumps;
 					//Debug.Log("Resetting jumps RIGHT.");
 				}
 				if (!feetTouching) {

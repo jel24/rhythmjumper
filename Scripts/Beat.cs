@@ -43,9 +43,7 @@ public class Beat : MonoBehaviour {
 		this.transform.localPosition = spawnPos;
 		tempo = newTempo;
 		speed = newTempo / 60f * distancePerBeat; 
-		//number = newNumber;
 		text.text = "O";
-		//text.text = number + "";
 
 		if (tempo != 0) {
 			framesPerBeat = Mathf.RoundToInt (60 / (tempo / 60));

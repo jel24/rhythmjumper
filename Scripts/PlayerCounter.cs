@@ -28,6 +28,11 @@ public class PlayerCounter : MonoBehaviour {
 		if (beats.Length != 8) {
 			Debug.Log ("Cannot find 8 beats.");
 		}
+
+		for (int i = 0; i < beats.Length; i++){
+			beats[i].GetComponent<Text>().text = i + "";
+		}
+
 		jumpTypeManager = FindObjectOfType<JumpTypeManager> ();
 		if (!jumpTypeManager) {
 			Debug.Log ("Cannot find Jump Type Manager.");
@@ -67,13 +72,14 @@ public class PlayerCounter : MonoBehaviour {
 		if (counter > 8) {
 			counter = 1;
 		}
+		//print ("Updating beat " + counter + " " + Time.timeSinceLevelLoad);
 		beats [counter - 1].transform.localPosition = beatSpawnPosition;
 		beats [counter - 1].Reset ();
 
 	}
 
 	public void Miss(){
-		int targetBeat = counter-2;
+		int targetBeat = counter-4;
 		print (targetBeat);
 		if (targetBeat > 8) {
 			targetBeat -= 8;
