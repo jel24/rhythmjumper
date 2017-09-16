@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour {
 
 	public float moveSpeed;
 	public float jumpSpeed;
-	public int jumpCooldownMax;
+	public float jumpCooldownMax;
 	public int maxBonusJumps;
 	public AudioClip waterSound;
 	public AudioClip missSound;
@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour {
 
 	private int jumps;
 	private int bonusJumps;
-	private int jumpCooldown;
+	private float jumpCooldown;
 	private int metronomeCounter;
 
 	private Rigidbody2D rigidbody;
@@ -74,6 +74,10 @@ public class PlayerController : MonoBehaviour {
 		if (!jumpTypeManager) {
 			Debug.Log ("Unable to find JumpTypeManager!");
 		}
+
+		jumpCooldown = 0f;
+		jumpCooldownMax = 0.1f;
+
 	}
 	
 	// Update is called once per frame
@@ -85,6 +89,13 @@ public class PlayerController : MonoBehaviour {
 		prevFrames [2] = prevFrames [1];
 		prevFrames [1] = prevFrames [0];
 		prevFrames [0] = inputX;
+
+		if (jumpCooldown > 0f) {
+			jumpCooldown -= Time.deltaTime;
+			print (jumpCooldown);
+		} else {
+			jumpCooldown = 0f;
+		}
 
 		if (statusManager.IsAlive () && inWater) {
 			ProcessWaterMovement ();
@@ -152,8 +163,7 @@ public class PlayerController : MonoBehaviour {
 		if (rigidbody.isKinematic) {
 			rigidbody.isKinematic = false;
 		}
-		maxBonusJumps = 3;
-		if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
+		if (CrossPlatformInputManager.GetButtonDown ("Jump") && !(jumpCooldown < 0f)) {
 			Jump ();
 		}
 		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft") && !jumping) {
@@ -167,11 +177,8 @@ public class PlayerController : MonoBehaviour {
 		if (CrossPlatformInputManager.GetButtonDown ("UsePowerup")) {
 			UsePowerup ();
 		}
-
-		if (jumpCooldown > 0) {
-			jumpCooldown--;
-		}
-		if (inputX != 0 && jumpCooldown == 0) {
+			
+		if (inputX != 0) {
 			if (inputX > 0 && onWallRight) {
 				// do nothing
 			}
@@ -203,20 +210,25 @@ public class PlayerController : MonoBehaviour {
 	private void Jump ()
 	{
 		float jumpModifier;
+		int maxJumps = 0;
 		JumpType j = jumpTypeManager.getJumpType ();
 
 		switch (j) {
 		case JumpType.Eighth:
-			jumpModifier = .5f;
+			jumpModifier = .67f;
+			maxJumps = 8;
 			break;
 		case JumpType.Quarter:
 			jumpModifier = 1f;
+			maxJumps = 4;
 			break;
 		case JumpType.Half:
-			jumpModifier = 1.75f;
+			jumpModifier = 1.33f;
+			maxJumps = 2;
 			break;
 		case JumpType.Whole:	
-			jumpModifier = 2.5f;
+			jumpModifier = 2f;
+			maxJumps = 1;
 			break;
 		default:
 			print ("No jump types available.");
@@ -228,24 +240,25 @@ public class PlayerController : MonoBehaviour {
 
 			jumping = true;
 
-			if (onWallLeft) {
-				rigidbody.velocity = new Vector2 (rigidbody.velocity.x + 5f, jumpSpeed * jumpModifier);
-				jumpCooldown += jumpCooldownMax;
-			} else if (onWallRight) {
-				rigidbody.velocity = new Vector2 (rigidbody.velocity.x - 5f, jumpSpeed * jumpModifier);
-				jumpCooldown += jumpCooldownMax;
-			} else {
-				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
-				jumpCooldown += jumpCooldownMax;
-			}
-
 			if (playerCounter.IsOnBeat ()) {
 				playerCounter.Hit ();
+
+				if (onWallLeft) {
+					rigidbody.velocity = new Vector2 (5f, jumpSpeed * jumpModifier);
+					jumpCooldown += jumpCooldownMax;
+				} else if (onWallRight) {
+					rigidbody.velocity = new Vector2 (-5f, jumpSpeed * jumpModifier);
+					jumpCooldown += jumpCooldownMax;
+				} else {
+					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
+					jumpCooldown += jumpCooldownMax;
+				}
+
 
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					metronomeCounter++;
 
-					if (metronomeCounter >= 3){
+					if (metronomeCounter >= maxJumps){
 						print ("Removing Metronome, expired.");
 						powerupManager.RemoveBuff ("MetronomeActive");
 					}
@@ -253,6 +266,24 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				playerCounter.Miss ();
+
+				// Display negative particles
+				ParticleTimer jumpFX = Instantiate (negativePrefab) as ParticleTimer;
+				jumpFX.GetComponent<ParticleTimer>().SetExpiration(3f);
+				jumpFX.transform.position = transform.position;
+				//
+
+				if (onWallLeft) {
+					rigidbody.velocity = new Vector2 (3f, jumpSpeed * jumpModifier * .5f);
+					jumpCooldown += jumpCooldownMax;
+				} else if (onWallRight) {
+					rigidbody.velocity = new Vector2 (-3f, jumpSpeed * jumpModifier * .5f);
+					jumpCooldown += jumpCooldownMax;
+				} else {
+					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier * .5f);
+					jumpCooldown += jumpCooldownMax;
+				}
+
 			}
 
 		} else if (jumping && bonusJumps > 0) {
@@ -262,7 +293,7 @@ public class PlayerController : MonoBehaviour {
 			Debug.Log (bonusJumps + " jumps left.");
 
 
-			if (playerCounter.IsOnBeat () && !playerCounter.ActiveBeatHitBefore()) {
+			if (playerCounter.IsOnBeat () && !playerCounter.ActiveBeatHitBefore() && jumpCooldown == 0) {
 				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
 				jumpCooldown += jumpCooldownMax;
 				Debug.Log ("On beat!");
@@ -283,7 +314,7 @@ public class PlayerController : MonoBehaviour {
 				if (powerupManager.HasBuff ("MetronomeActive")){
 					metronomeCounter++;
 
-					if (metronomeCounter >= 3){
+					if (metronomeCounter >= maxJumps){
 						print ("Removing Metronome, expired.");
 						powerupManager.RemoveBuff ("MetronomeActive");
 					}
@@ -402,10 +433,31 @@ public class PlayerController : MonoBehaviour {
 			metronomeCounter = 0;
 			powerupManager.RemoveBuff ("Metronome");
 
+			JumpType j = jumpTypeManager.getJumpType ();
+			int maxJumps = 0;
+
+			switch (j) {
+			case JumpType.Eighth:
+				maxJumps = 8;
+				break;
+			case JumpType.Quarter:
+				maxJumps = 4;
+				break;
+			case JumpType.Half:
+				maxJumps = 2;
+				break;
+			case JumpType.Whole:	
+				maxJumps = 1;
+				break;
+			default:
+				print ("No jump types available.");
+				break;
+			}
+
 			ParticleTimer phoenixFX = Instantiate (phoenixPrefab, gameObject.transform) as ParticleTimer;
 			phoenixFX.GetComponent<ParticleTimer>().SetExpiration(4f);
 			phoenixFX.transform.position = transform.position;
-			bonusJumps = 3;
+			bonusJumps = maxJumps;
 			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * 2f);
 
 		}

@@ -17,39 +17,46 @@ public class JumpTypeManager : MonoBehaviour {
 	public Sprite[] graphics;
 	public Object prefab;
 
-	private List<JumpType> typeList;
+	private List<JumpTypeNote> typeList;
 	private PlayerCounter counter;
+
+	private Vector2[] jumpTypeNotePositions;
 
 	// Use this for initialization
 	void Start () {
-		typeList = new List<JumpType> ();
+		typeList = new List<JumpTypeNote> ();
 		counter = FindObjectOfType<PlayerCounter> ();
 		if (!counter) {
 			Debug.Log ("Unable to find PlayerCounter");
 		}
+			
+		jumpTypeNotePositions = new Vector2[7];
+
+		jumpTypeNotePositions[0] = new Vector2 (-6f, 0f);
+		jumpTypeNotePositions[1] = new Vector2 (-4f, 0f);
+		jumpTypeNotePositions[2] = new Vector2 (-2f, 0f);
+		jumpTypeNotePositions[3] = new Vector2 (0f, 0f);
+		jumpTypeNotePositions[4] = new Vector2 (2f, 0f);
+		jumpTypeNotePositions[5] = new Vector2 (4f, 0f);
+		jumpTypeNotePositions[6] = new Vector2 (6f, 0f);
 
 
-		AddJumpType (JumpType.Eighth);
 		AddJumpType (JumpType.Quarter);
 		AddJumpType (JumpType.Half);
-
+		AddJumpType (JumpType.Eighth);
 		AddJumpType (JumpType.Whole);
-
 
 
 	}
 
 	public void AddJumpType(JumpType j){
 
-		if (typeList.Count == 0) {
-			SetCurrentType(j);
-			counter.UpdateBeatDisplayForJumpType (j);
-		}
 
-		typeList.Add (j);
+
 		GameObject o = Instantiate (prefab, this.transform) as GameObject;
 
-		print (o.name);
+		o.GetComponent<JumpTypeNote> ().SetJumpType (j);
+		typeList.Add (o.GetComponent<JumpTypeNote>());
 
 		switch (j) {
 		case JumpType.Eighth: 
@@ -65,20 +72,25 @@ public class JumpTypeManager : MonoBehaviour {
 			o.GetComponent<Image>().sprite = graphics[3];
 			break;
 		}
-
+			
 		UpdateDisplayPositions ();
+
+		if (typeList.Count == 1) {
+			SetCurrentType(j);
+			counter.UpdateBeatDisplayForJumpType (j);
+		}
 	}
 
 	public JumpType SwapLeft(){
 		int newPos = findCurrentType () - 1;
-		print (newPos);
+		//print (newPos);
 
 		if (newPos == -1) {
 			newPos = typeList.Count - 1;
 		}
 			
-		SetCurrentType(typeList [newPos]);
-		return typeList [newPos];
+		SetCurrentType(typeList [newPos].GetJumpType());
+		return typeList [newPos].GetJumpType();
 	}
 
 	public JumpType SwapRight(){
@@ -87,16 +99,16 @@ public class JumpTypeManager : MonoBehaviour {
 		if (newPos >= typeList.Count) {
 			newPos = 0;
 		}
-		print (typeList[newPos]);
+		//print (typeList[newPos]);
 
-		SetCurrentType(typeList [newPos]);
-		return typeList [newPos];
+		SetCurrentType(typeList [newPos].GetJumpType());
+		return typeList [newPos].GetJumpType();
 	}
 
 	private int findCurrentType(){
 		int index = 0;
 		for (int i = 0; i < typeList.Count; i++) {
-			if (typeList [i] == currentType) {
+			if (typeList [i].GetJumpType() == currentType) {
 				index = i;
 			}
 		}
@@ -116,60 +128,69 @@ public class JumpTypeManager : MonoBehaviour {
 
 	private void UpdateDisplayPositions(){
 
+		List<JumpTypeNote> newList = new List<JumpTypeNote> ();
 
-			Image[] children = GetComponentsInChildren<Image> ();
+		foreach (JumpTypeNote t in typeList) {
+			if (t.GetJumpType() == JumpType.Eighth) {
+				newList.Add (t);
+				break;
+			}
+		}
+		foreach (JumpTypeNote t in typeList) {
+			if (t.GetJumpType() == JumpType.Quarter) {
+				newList.Add (t);
+				break;
+			}
+		}
+		foreach (JumpTypeNote t in typeList) {
+			if (t.GetJumpType() == JumpType.Half) {
+				newList.Add (t);
+				break;
+			}
+		}
+		foreach (JumpTypeNote t in typeList) {
+			if (t.GetJumpType() == JumpType.Whole) {
+				newList.Add (t);
+				break;
+			}
+		}
+	
+		typeList = newList;
 
 			switch (typeList.Count) {
 			case 1: 
-				children [1].rectTransform.anchoredPosition = new Vector2 (0f, 0f);
+				typeList[0].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[3];
 				break;
 			case 2:
-				children [1].rectTransform.anchoredPosition = new Vector2 (-2f, 0f);
-				children [2].rectTransform.anchoredPosition = new Vector2 (2f, 0f);
+				typeList[0].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[2];
+				typeList[1].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[4];
 				break;
 			case 3:
-				children [1].rectTransform.anchoredPosition = new Vector2 (-4f, 0f);
-				children [2].rectTransform.anchoredPosition = new Vector2 (0f, 0f);
-				children [3].rectTransform.anchoredPosition = new Vector2 (4f, 0f);
+				typeList[0].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[1];
+				typeList[1].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[3];
+				typeList[2].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[5];
 				break;
 			case 4:		
-				children [1].rectTransform.anchoredPosition = new Vector2 (-6f, 0f);
-				children [2].rectTransform.anchoredPosition = new Vector2 (-2f, 0f);
-				children [3].rectTransform.anchoredPosition = new Vector2 (2f, 0f);
-				children [4].rectTransform.anchoredPosition = new Vector2 (6f, 0f);
+				typeList[0].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[0];
+				typeList[1].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[2];
+				typeList[2].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[4];
+				typeList[3].GetComponent<Image>().rectTransform.anchoredPosition = jumpTypeNotePositions[6];
 				break;
 			}
 
 	}
 
 	private void UpdateActiveDisplay(){
-		Image[] children = GetComponentsInChildren<Image> ();
 
-		for (int i = 1; i < children.Length; i++) {
-			children [i].color = Color.white;
+		int x = findCurrentType ();
+
+		print (x);
+
+		for (int i = 0; i < typeList.Count; i++) {
+			typeList [i].GetComponent<Image>().color = Color.gray;
 		}
-
-		if (typeList.Count == 4) {
-			print ("in switch");
-			switch (currentType) {
-			case JumpType.Eighth:
-				children [1].color = Color.red;
-				break;
-			case JumpType.Quarter:
-				children [2].color = Color.red;
-
-				break;
-			case JumpType.Half:
-				children [3].color = Color.red;
-
-				break;
-			case JumpType.Whole:
-				children [4].color = Color.red;
-
-				break;
-			}
-		}
-
+			
+		typeList [x].GetComponent<Image>().color = Color.white;
 
 	}
 }

@@ -10,7 +10,6 @@ public class Beat : MonoBehaviour {
 	private float distancePerBeat;
 	private RectTransform rect;
 	private int tempo;
-	//private int number;
 	private bool miss;
 	private bool hit;
 	private bool fade;
@@ -36,6 +35,10 @@ public class Beat : MonoBehaviour {
 
 	public void UpdateForJumpType(bool showing){
 		activeForJumpType = showing;
+	}
+
+	public bool IsActiveForJumpType(){
+		return activeForJumpType;
 	}
 
 	public void InitializeBeat(int newTempo, int newNumber, Vector2 spawnPos){
