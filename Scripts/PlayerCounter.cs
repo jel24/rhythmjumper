@@ -19,11 +19,12 @@ public class PlayerCounter : MonoBehaviour {
 	private JumpTypeManager jumpTypeManager;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		counter = 0;
 		tempo = 0;
 		streak = 0;
 		beats = FindObjectsOfType<Beat> ();
+		//Debug.Log ("Beats created.");
 		onBeat = false;
 		if (beats.Length != 8) {
 			Debug.Log ("Cannot find 8 beats.");
@@ -83,12 +84,13 @@ public class PlayerCounter : MonoBehaviour {
 
 	public void Miss(){
 		int targetBeat = counter-4;
-		print (targetBeat);
 		if (targetBeat > 8) {
 			targetBeat -= 8;
 		} else if (targetBeat < 0) {
 			targetBeat += 8;
 		}
+		print (targetBeat);
+
 		beats [targetBeat].Miss ();
 	}
 		
@@ -127,6 +129,7 @@ public class PlayerCounter : MonoBehaviour {
 			}
 			break;
 		case JumpType.Quarter:
+			//print (beats == null);
 			for (int i = 0; i < beats.Length; i++) {
 				if (i % 2 == 0) {
 					beats[i].UpdateForJumpType (true);

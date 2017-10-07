@@ -4,10 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerStatusManager : MonoBehaviour {
 
-
 	public Vector3 startLocation;
-
-
 	private Animator animator;
 	private bool alive;
 	private HashSet<Powerup> powerups;
@@ -17,9 +14,13 @@ public class PlayerStatusManager : MonoBehaviour {
 	private CameraController cameraController;
 
 
+	void OnDrawGizmos(){
+	}
+
 	// Use this for initialization
 	void Start ()
 	{
+		startLocation = transform.position;
 		animator = GetComponent<Animator> ();
 		powerups = new HashSet<Powerup>();
 

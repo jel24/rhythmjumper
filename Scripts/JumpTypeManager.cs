@@ -40,18 +40,11 @@ public class JumpTypeManager : MonoBehaviour {
 		jumpTypeNotePositions[5] = new Vector2 (4f, 0f);
 		jumpTypeNotePositions[6] = new Vector2 (6f, 0f);
 
-
 		AddJumpType (JumpType.Quarter);
-		AddJumpType (JumpType.Half);
-		AddJumpType (JumpType.Eighth);
-		AddJumpType (JumpType.Whole);
-
 
 	}
 
 	public void AddJumpType(JumpType j){
-
-
 
 		GameObject o = Instantiate (prefab, this.transform) as GameObject;
 
@@ -184,7 +177,7 @@ public class JumpTypeManager : MonoBehaviour {
 
 		int x = findCurrentType ();
 
-		print (x);
+		//print (x);
 
 		for (int i = 0; i < typeList.Count; i++) {
 			typeList [i].GetComponent<Image>().color = Color.gray;

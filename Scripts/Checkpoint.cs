@@ -21,8 +21,6 @@ public class Checkpoint : MonoBehaviour {
 	}
 
 	void OnDrawGizmos(){
-		Gizmos.color = Color.red;
-		Gizmos.DrawSphere (transform.position, 1);
 	}
 
 	void OnTriggerEnter2D (Collider2D coll)

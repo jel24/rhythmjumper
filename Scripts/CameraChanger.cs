@@ -13,8 +13,6 @@ public class CameraChanger : MonoBehaviour {
 	}
 
 	void OnDrawGizmos(){
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawSphere (transform.position, 1);
 	}
 
 	void OnTriggerEnter2D (Collider2D coll)

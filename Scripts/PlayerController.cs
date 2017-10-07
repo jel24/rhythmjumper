@@ -11,7 +11,8 @@ public class PlayerController : MonoBehaviour {
 	public AudioClip waterSound;
 	public AudioClip missSound;
 	public AudioClip hitSound;
-
+	public delegate void OnJumpFunctionsDelegate ();
+	public static OnJumpFunctionsDelegate jumpDelegate;
 
 	public bool jumping;
 	public ParticleTimer gracePrefab;
@@ -77,6 +78,7 @@ public class PlayerController : MonoBehaviour {
 
 		jumpCooldown = 0f;
 		jumpCooldownMax = 0.1f;
+		jumpDelegate += DelegateChecker;
 
 	}
 	
@@ -92,7 +94,7 @@ public class PlayerController : MonoBehaviour {
 
 		if (jumpCooldown > 0f) {
 			jumpCooldown -= Time.deltaTime;
-			print (jumpCooldown);
+			//print (jumpCooldown);
 		} else {
 			jumpCooldown = 0f;
 		}
@@ -186,7 +188,7 @@ public class PlayerController : MonoBehaviour {
 				if (inputX < 0 && onWallLeft) {
 					// do nothing
 				}
-				else {
+				else if (jumpCooldown <= 0){
 					// Debug.Log (inputX * moveSpeed * Time.deltaTime);
 					rigidbody.velocity = new Vector2 (inputX * moveSpeed, rigidbody.velocity.y);
 				}
@@ -237,7 +239,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		if (!jumping) {
-
+			jumpDelegate ();
 			jumping = true;
 
 			if (playerCounter.IsOnBeat ()) {
@@ -274,20 +276,20 @@ public class PlayerController : MonoBehaviour {
 				//
 
 				if (onWallLeft) {
-					rigidbody.velocity = new Vector2 (3f, jumpSpeed * jumpModifier * .5f);
+					rigidbody.velocity = new Vector2 (3f, jumpSpeed * jumpModifier * .67f);
 					jumpCooldown += jumpCooldownMax;
 				} else if (onWallRight) {
-					rigidbody.velocity = new Vector2 (-3f, jumpSpeed * jumpModifier * .5f);
+					rigidbody.velocity = new Vector2 (-3f, jumpSpeed * jumpModifier * .67f);
 					jumpCooldown += jumpCooldownMax;
 				} else {
-					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier * .5f);
+					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier * .67f);
 					jumpCooldown += jumpCooldownMax;
 				}
 
 			}
 
 		} else if (jumping && bonusJumps > 0) {
-
+			jumpDelegate ();
 			animator.SetTrigger ("doubleJump");
 			bonusJumps--;
 			Debug.Log (bonusJumps + " jumps left.");
@@ -321,7 +323,7 @@ public class PlayerController : MonoBehaviour {
 				}
 
 			} else {
-				rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .7f, jumpSpeed * jumpModifier * .3f);
+				rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .67f, jumpSpeed * jumpModifier * .67f);
 				jumpCooldown += jumpCooldownMax;
 				playerCounter.Miss ();
 				// Display negative particles
@@ -508,5 +510,13 @@ public class PlayerController : MonoBehaviour {
 
 	public bool IsInWater(){
 		return inWater;
+	}
+
+	public void AddFunctionToJump(OnJumpFunctionsDelegate method){
+		jumpDelegate += method;
+	}
+
+	private void DelegateChecker(){
+		Debug.Log ("Delegated!");
 	}
 }

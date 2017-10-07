@@ -17,7 +17,7 @@ public class LoadManager : MonoBehaviour {
 		if (!loader) {
 			Debug.Log ("LoadManager can't find image in child.");
 		}
-		Debug.Log (loader.name);
+		//Debug.Log (loader.name);
 		fadeIn = true;
 	}
 
