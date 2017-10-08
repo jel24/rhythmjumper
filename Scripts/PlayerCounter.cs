@@ -89,7 +89,7 @@ public class PlayerCounter : MonoBehaviour {
 		} else if (targetBeat < 0) {
 			targetBeat += 8;
 		}
-		print (targetBeat);
+//		print (targetBeat);
 
 		beats [targetBeat].Miss ();
 	}

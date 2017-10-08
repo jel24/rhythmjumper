@@ -51,7 +51,7 @@ public class PlayerStatusManager : MonoBehaviour {
 	{
 		//Debug.Log("told to kill");
 		if (alive) {
-			Debug.Log("killed!");
+			Debug.Log("Killed!");
 			alive = false;
 			Invoke("Respawn", 1f);
 			animator.SetTrigger("death");

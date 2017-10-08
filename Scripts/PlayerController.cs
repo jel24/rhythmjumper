@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void LateUpdate ()
 	{
 
 		float inputX = CrossPlatformInputManager.GetAxis ("Horizontal");

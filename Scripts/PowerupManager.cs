@@ -107,7 +107,7 @@ public class PowerupManager : MonoBehaviour {
 		powerUps = new Dictionary<Powerup, bool> ();
 		foreach (Powerup p in savedState.Keys) {
 			powerUps.Add (p, savedState [p]);
-			Debug.Log ("Adding " + p.name + ", " + savedState[p] + " to saved PowerUps");
+			//Debug.Log ("Adding " + p.name + ", " + savedState[p] + " to saved PowerUps");
 			p.gameObject.SetActive (!savedState[p]);
 			if (savedState [p]) {
 				AddPowerUp (p);
