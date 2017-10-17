@@ -13,7 +13,6 @@ public class PlayerCounter : MonoBehaviour {
 	private Beat[] beats;
 	private Vector2 playerPos;
 
-	private bool onBeat;
 	private Beat activeBeat;
 	private int streak;
 	private JumpTypeManager jumpTypeManager;
@@ -25,7 +24,6 @@ public class PlayerCounter : MonoBehaviour {
 		streak = 0;
 		beats = FindObjectsOfType<Beat> ();
 		//Debug.Log ("Beats created.");
-		onBeat = false;
 		if (beats.Length != 8) {
 			Debug.Log ("Cannot find 8 beats.");
 		}
@@ -39,14 +37,16 @@ public class PlayerCounter : MonoBehaviour {
 			Debug.Log ("Cannot find Jump Type Manager.");
 
 		}
+
+		UpdateBeatDisplayForJumpType (JumpType.Quarter);
 	}
 
 	void OnTriggerEnter2D (Collider2D coll){
 		if (coll.GetComponent<Beat> ()) {
-			//Debug.Log ("New beat.");
 			if (coll.GetComponent<Beat> ().IsActiveForJumpType ()) {
 				activeBeat = coll.GetComponent<Beat> ();
-				onBeat = true;
+				//Debug.Log (coll.name);
+
 			}
 
 		}
@@ -54,8 +54,12 @@ public class PlayerCounter : MonoBehaviour {
 
 	void OnTriggerExit2D (Collider2D coll){
 		if (coll.GetComponent<Beat> ()) {
-			onBeat = false;
-			coll.GetComponent<Beat>().StartFade ();
+			if (coll.GetComponent<Beat> ().IsActiveForJumpType ()) {
+				coll.GetComponent<Beat>().StartFade ();
+				if (activeBeat == coll.GetComponent<Beat>()){
+					activeBeat = null;
+				}
+			}
 		}
 	}
 
@@ -67,7 +71,10 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public bool ActiveBeatHitBefore() {
-		return activeBeat.BeatHitBefore ();
+		if (activeBeat != null) {
+			return activeBeat.BeatHitBefore ();
+		}
+		return true;
 	}
 
 	public void UpdateNumber(){
@@ -99,12 +106,15 @@ public class PlayerCounter : MonoBehaviour {
 	}
 
 	public void Hit(){
-		activeBeat.Hit ();
-		streak++;
+		if (activeBeat != null) {
+			activeBeat.Hit ();
+			streak++;
+		}
+
 	}
 
 	public bool IsOnBeat(){
-		return onBeat;
+		return activeBeat != null;
 	}
 		
 
