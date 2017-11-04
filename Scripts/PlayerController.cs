@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour {
 	private bool headTouching;
 	private bool feetTouching;
 	private bool inWater;
+	private bool isSlippery;
 
 	private Vector2 waterAddedVelocity;
 	private PowerupManager powerupManager;
@@ -56,6 +57,10 @@ public class PlayerController : MonoBehaviour {
 		renderer = GetComponent<SpriteRenderer>();
 		statusManager = GetComponent<PlayerStatusManager>();
 		audioSource = GetComponent<AudioSource> ();
+
+		inWater = false;
+		isSlippery = false;
+
 		if (!statusManager) {
 			Debug.Log ("Unable to find StatusManager!");
 		}
@@ -78,7 +83,8 @@ public class PlayerController : MonoBehaviour {
 
 		jumpCooldown = 0f;
 		jumpCooldownMax = 0.1f;
-		jumpDelegate += DelegateChecker;
+		jumpDelegate += OnJump;
+
 
 	}
 	
@@ -181,27 +187,25 @@ public class PlayerController : MonoBehaviour {
 		}
 			
 		if (inputX != 0) {
-			if (inputX > 0 && onWallRight) {
-				// do nothing
+
+
+			if (!onWallRight && inputX > 0 && !jumping || !onWallLeft && inputX < 0 && !jumping) {
+				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
+			} 
+
+			if (jumping && jumpCooldown <= 0) {
+				Debug.Log("Jumping off wall");
+				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
 			}
-			else
-				if (inputX < 0 && onWallLeft) {
-					// do nothing
-				}
-				else if (jumpCooldown <= 0){
-					// Debug.Log (inputX * moveSpeed * Time.deltaTime);
-					rigidbody.velocity = new Vector2 (inputX * moveSpeed, rigidbody.velocity.y);
-				}
+
 			if (!jumping) {
 				animator.SetBool ("running", true);
 			}
 			if (inputX > 0) {
 				renderer.flipX = false;
+			} else if (inputX < 0) {
+				renderer.flipX = true;
 			}
-			else
-				if (inputX < 0) {
-					renderer.flipX = true;
-				}
 		}
 		else
 			if (!jumping) {
@@ -374,7 +378,7 @@ public class PlayerController : MonoBehaviour {
 				feetTouching = true;
 			} else if (name == "Head") {
 				headTouching = true;
-			} else if (name == "Left") {
+			} else if (name == "Left" && !isSlippery) {
 				onWallLeft = true;
 				jumping = false;
 				if (!headTouching) {
@@ -388,7 +392,7 @@ public class PlayerController : MonoBehaviour {
 				}
 				animator.SetBool ("jumping", false);
 				renderer.flipX = true;
-			} else if (name == "Right") {
+			} else if (name == "Right" && !isSlippery) {
 				onWallRight = true;
 				jumping = false;
 				if (!headTouching) {
@@ -504,6 +508,11 @@ public class PlayerController : MonoBehaviour {
 
 	}
 		
+
+	public void ChangeSlipStatus(bool inSlipRegion){
+		isSlippery = inSlipRegion;
+	}
+
 	private void RemoveGraceBuff(){
 		powerupManager.RemoveBuff ("Grace");
 	}
@@ -516,7 +525,7 @@ public class PlayerController : MonoBehaviour {
 		jumpDelegate += method;
 	}
 
-	private void DelegateChecker(){
+	private void OnJump(){
 		Debug.Log ("Delegated!");
 	}
 }
