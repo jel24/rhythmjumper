@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 	private int bonusJumps;
 	private float jumpCooldown;
 	private int metronomeCounter;
+	private int tripletCounter;
 
 	private Rigidbody2D rigidbody;
 	private Animator animator;
@@ -218,6 +219,9 @@ public class PlayerController : MonoBehaviour {
 		int maxJumps = 0;
 		JumpType j = jumpTypeManager.getJumpType ();
 
+		tripletCounter += 1;
+		print (tripletCounter);
+
 		switch (j) {
 		case JumpType.Eighth:
 			jumpModifier = .67f;
@@ -239,6 +243,12 @@ public class PlayerController : MonoBehaviour {
 			print ("No jump types available.");
 			jumpModifier = 1.0f;
 			break;
+		}
+
+		if (tripletCounter == 3) {
+			bonusJumps = 0;
+			tripletCounter = 0;
+			rigidbody.velocity = new Vector2 (rigidbody.velocity.x * 1.5f, jumpSpeed * jumpModifier * 1.5f);
 		}
 
 		if (!jumping) {
@@ -371,6 +381,8 @@ public class PlayerController : MonoBehaviour {
 
 			if (name == "Feet") {
 				jumping = false;
+				tripletCounter = 0;
+
 				bonusJumps = refreshJumps;
 				animator.SetBool ("jumping", false);
 				animator.SetBool ("onwall", false);
@@ -379,6 +391,8 @@ public class PlayerController : MonoBehaviour {
 				headTouching = true;
 			} else if (name == "Left" && !isSlippery) {
 				onWallLeft = true;
+				tripletCounter = 0;
+
 				jumping = false;
 				if (!headTouching) {
 					bonusJumps = refreshJumps;
@@ -394,6 +408,8 @@ public class PlayerController : MonoBehaviour {
 			} else if (name == "Right" && !isSlippery) {
 				onWallRight = true;
 				jumping = false;
+				tripletCounter = 0;
+
 				if (!headTouching) {
 					bonusJumps = refreshJumps;
 					//Debug.Log("Resetting jumps RIGHT.");
@@ -522,6 +538,11 @@ public class PlayerController : MonoBehaviour {
 
 	public void AddFunctionToJump(OnJumpFunctionsDelegate method){
 		jumpDelegate += method;
+	}
+
+	public void ResetTriplets(){
+		tripletCounter = 0;
+		print ("Resetting triplets");
 	}
 
 	private void OnJump(){
