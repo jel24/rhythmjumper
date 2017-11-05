@@ -9,8 +9,9 @@ public class SlipRegion : MonoBehaviour {
 
 	void OnDrawGizmos(){
 		Gizmos.color = new Color (0f, 100f, 0f, .5f);
+		Gizmos.matrix = transform.localToWorldMatrix;
 		boxCollider = GetComponent<BoxCollider2D> ();
-		Gizmos.DrawCube(transform.position, new Vector3(boxCollider.size.x, boxCollider.size.y, 1f));
+		Gizmos.DrawCube(Vector3.zero, new Vector3(boxCollider.size.x, boxCollider.size.y, 1f));
 	}
 
 	void OnTriggerEnter2D(Collider2D coll)

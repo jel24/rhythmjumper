@@ -186,15 +186,12 @@ public class PlayerController : MonoBehaviour {
 			UsePowerup ();
 		}
 			
-		if (inputX != 0) {
 
-
-			if (!onWallRight && inputX > 0 && !jumping || !onWallLeft && inputX < 0 && !jumping) {
+			if (!onWallRight && inputX >= 0 && !jumping || !onWallLeft && inputX <= 0 && !jumping) {
 				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
 			} 
 
 			if (jumping && jumpCooldown <= 0) {
-				Debug.Log("Jumping off wall");
 				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
 			}
 
@@ -206,11 +203,13 @@ public class PlayerController : MonoBehaviour {
 			} else if (inputX < 0) {
 				renderer.flipX = true;
 			}
+
+		if (!jumping && Mathf.Abs (inputX) > 0) {
+			animator.SetBool ("running", true);
+		} else if (!jumping && inputX == 0) {
+			animator.SetBool ("running", false);
+
 		}
-		else
-			if (!jumping) {
-				animator.SetBool ("running", false);
-			}
 	}
 
 	private void Jump ()
