@@ -42,6 +42,9 @@ public class PlayerController : MonoBehaviour {
 	private bool feetTouching;
 	private bool inWater;
 	private bool isSlippery;
+	private bool tripletJumpUsed;
+
+	public bool tripletJumpEnabled;
 
 	private Vector2 waterAddedVelocity;
 	private PowerupManager powerupManager;
@@ -61,6 +64,7 @@ public class PlayerController : MonoBehaviour {
 
 		inWater = false;
 		isSlippery = false;
+		tripletJumpUsed = false;
 
 		if (!statusManager) {
 			Debug.Log ("Unable to find StatusManager!");
@@ -183,6 +187,10 @@ public class PlayerController : MonoBehaviour {
 			jumpTypeManager.SwapRight ();
 		}
 
+		if (CrossPlatformInputManager.GetButtonDown ("Triplet") && tripletJumpEnabled) {
+			TripletJump ();
+		}
+
 		if (CrossPlatformInputManager.GetButtonDown ("UsePowerup")) {
 			UsePowerup ();
 		}
@@ -219,8 +227,7 @@ public class PlayerController : MonoBehaviour {
 		int maxJumps = 0;
 		JumpType j = jumpTypeManager.getJumpType ();
 
-		tripletCounter += 1;
-		print (tripletCounter);
+
 
 		switch (j) {
 		case JumpType.Eighth:
@@ -245,11 +252,7 @@ public class PlayerController : MonoBehaviour {
 			break;
 		}
 
-		if (tripletCounter == 3) {
-			bonusJumps = 0;
-			tripletCounter = 0;
-			rigidbody.velocity = new Vector2 (rigidbody.velocity.x * 1.5f, jumpSpeed * jumpModifier * 1.5f);
-		}
+
 
 		if (!jumping) {
 			jumpDelegate ();
@@ -355,6 +358,41 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
+	private void TripletJump(){
+
+
+		tripletCounter += 1;
+		print (tripletCounter);
+		if (tripletCounter == 2 && !tripletJumpUsed) {
+			tripletJumpUsed = true;
+			float jumpModifier;
+			JumpType j = jumpTypeManager.getJumpType ();
+
+			switch (j) {
+			case JumpType.Eighth:
+				jumpModifier = .67f;
+				break;
+			case JumpType.Quarter:
+				jumpModifier = 1f;
+				break;
+			case JumpType.Half:
+				jumpModifier = 1.33f;
+				break;
+			case JumpType.Whole:	
+				jumpModifier = 2f;
+				break;
+			default:
+				print ("No jump types available.");
+				jumpModifier = 1.0f;
+				break;
+			}
+
+			bonusJumps = 0;
+			tripletCounter = 0;
+			rigidbody.velocity = new Vector2 (rigidbody.velocity.x * 1.5f, jumpSpeed * jumpModifier * 1.5f);
+		}
+	}
+
 	public void StartTouching (string name)
 	{
 		if (!inWater) {
@@ -381,18 +419,16 @@ public class PlayerController : MonoBehaviour {
 
 			if (name == "Feet") {
 				jumping = false;
-				tripletCounter = 0;
-
 				bonusJumps = refreshJumps;
 				animator.SetBool ("jumping", false);
 				animator.SetBool ("onwall", false);
 				feetTouching = true;
+				tripletJumpUsed = false;
 			} else if (name == "Head") {
 				headTouching = true;
 			} else if (name == "Left" && !isSlippery) {
 				onWallLeft = true;
-				tripletCounter = 0;
-
+				tripletJumpUsed = false;
 				jumping = false;
 				if (!headTouching) {
 					bonusJumps = refreshJumps;
@@ -408,7 +444,7 @@ public class PlayerController : MonoBehaviour {
 			} else if (name == "Right" && !isSlippery) {
 				onWallRight = true;
 				jumping = false;
-				tripletCounter = 0;
+				tripletJumpUsed = false;
 
 				if (!headTouching) {
 					bonusJumps = refreshJumps;
