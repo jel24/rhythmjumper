@@ -12,7 +12,7 @@ public enum MazeDirection
 public class Maze : MonoBehaviour {
 
 	private MazeDirection direction;
-
+	private float magnitude;
 
 
 	// Use this for initialization
@@ -27,15 +27,19 @@ public class Maze : MonoBehaviour {
 		case MazeDirection.still:
 			break;
 		case MazeDirection.right:
-			this.transform.Rotate (0f, 0f, .30f);
+			this.transform.Rotate (0f, 0f, magnitude);
 			break;
 		case MazeDirection.left:
-			this.transform.Rotate (0f, 0f, -.30f);
+			this.transform.Rotate (0f, 0f, -magnitude);
 			break;
 		}
 	}
 
 	public void SetDirection(MazeDirection d){
-		direction = d;
+		if (direction == MazeDirection.left) {
+			magnitude -= .05f;
+		} else if (direction == MazeDirection.right) {
+			magnitude += .05f;
+		}
 	}
 }

@@ -7,9 +7,12 @@ public class MazeButton : MonoBehaviour {
 	public MazeDirection direction;
 	public Maze maze;
 
-	void OnTriggerEnter2D (Collider2D coll)
+	void OnCollisionStay2D(Collision2D coll)
 	{
-		if (coll.gameObject.tag == "Player") {
+		
+
+		if (coll.collider.gameObject.tag == "Player") {
+			Debug.Log ("Adding.");
 			maze.SetDirection (direction);
 		}
 	}

@@ -578,10 +578,10 @@ public class PlayerController : MonoBehaviour {
 
 	public void ResetTriplets(){
 		tripletCounter = 0;
-		print ("Resetting triplets");
+		//print ("Resetting triplets");
 	}
 
 	private void OnJump(){
-		Debug.Log ("Delegated!");
+		//Debug.Log ("Delegated!");
 	}
 }
