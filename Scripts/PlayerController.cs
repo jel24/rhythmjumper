@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour {
 
 	private MetronomeManager metronomeManager;
 	private PlayerStatusManager statusManager;
+	private ProgressManager progManager;
 
 	private int jumps;
 	private int bonusJumps;
@@ -43,8 +44,6 @@ public class PlayerController : MonoBehaviour {
 	private bool inWater;
 	private bool isSlippery;
 	private bool tripletJumpUsed;
-
-	public bool tripletJumpEnabled;
 
 	private Vector2 waterAddedVelocity;
 	private PowerupManager powerupManager;
@@ -84,6 +83,10 @@ public class PlayerController : MonoBehaviour {
 		jumpTypeManager = FindObjectOfType<JumpTypeManager> ();
 		if (!jumpTypeManager) {
 			Debug.Log ("Unable to find JumpTypeManager!");
+		}
+		progManager = FindObjectOfType<ProgressManager> ();
+		if (!progManager) {
+			Debug.Log ("Unable to find ProgressManager.");
 		}
 
 		jumpCooldown = 0f;
@@ -187,7 +190,7 @@ public class PlayerController : MonoBehaviour {
 			jumpTypeManager.SwapRight ();
 		}
 
-		if (CrossPlatformInputManager.GetButtonDown ("Triplet") && tripletJumpEnabled) {
+		if (CrossPlatformInputManager.GetButtonDown ("Triplet") && progManager.HasUpgrade(Upgrade.TripletJump)) {
 			TripletJump ();
 		}
 

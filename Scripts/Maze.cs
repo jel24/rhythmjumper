@@ -6,40 +6,61 @@ public enum MazeDirection
 {
 	left,
 	right,
-	still
 }
 
 public class Maze : MonoBehaviour {
 
-	private MazeDirection direction;
 	private float magnitude;
 
 
+	private int consecutive;
+	private PlayerCounter playerCounter;
+	private bool puzzleBeaten;
+
 	// Use this for initialization
 	void Start () {
-		direction = MazeDirection.still;
+		playerCounter = FindObjectOfType<PlayerCounter> ();
+		puzzleBeaten = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
-		switch (direction) {
-		case MazeDirection.still:
-			break;
-		case MazeDirection.right:
+		if (magnitude != 0) {
 			this.transform.Rotate (0f, 0f, magnitude);
-			break;
-		case MazeDirection.left:
-			this.transform.Rotate (0f, 0f, -magnitude);
-			break;
+
 		}
+
 	}
 
 	public void SetDirection(MazeDirection d){
-		if (direction == MazeDirection.left) {
-			magnitude -= .05f;
-		} else if (direction == MazeDirection.right) {
-			magnitude += .05f;
+		if (d == MazeDirection.left) {
+			magnitude -= .01f;
+			if (magnitude < -3f) {
+				magnitude = -3f;
+			}
+		} else if (d == MazeDirection.right) {
+			magnitude += .01f;
+			if (magnitude > 3f) {
+				magnitude = 3f;
+			}
+		}
+	}
+
+	public void BellRung(){
+		if (playerCounter.IsOnBeat()) {
+			playerCounter.Hit ();
+			consecutive += 1;
+			Debug.Log ("Bell rung on beat, " + consecutive);
+			if (consecutive >= 8 && !puzzleBeaten) {
+				Debug.Log ("Puzzle passed.");
+				puzzleBeaten = true;
+				gameObject.SetActive (false);
+				//puzzle passed
+			}
+		} else {
+			consecutive = 0;
+			Debug.Log ("Bell rung off beat.");
+
 		}
 	}
 }

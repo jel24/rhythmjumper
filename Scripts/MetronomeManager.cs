@@ -7,7 +7,6 @@ public class MetronomeManager : MonoBehaviour {
 
 	public int tempo;
 	public Image[] powerUpImages;
-	public float errorThreshold;
 	public bool musicLevel;
 	public Vector3 spawnPoint; 
 

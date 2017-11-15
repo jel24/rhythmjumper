@@ -12,7 +12,7 @@ public class MazeButton : MonoBehaviour {
 		
 
 		if (coll.collider.gameObject.tag == "Player") {
-			Debug.Log ("Adding.");
+			//Debug.Log ("Adding.");
 			maze.SetDirection (direction);
 		}
 	}

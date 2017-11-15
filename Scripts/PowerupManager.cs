@@ -6,12 +6,15 @@ using UnityEngine.UI;
 public class PowerupManager : MonoBehaviour {
 
 	public Text text;
+	public Object progManagerPrefab;
+
 	private Dictionary<Powerup, bool> powerUps;
 	private Dictionary<Powerup, bool> savedState;
 
 	private HashSet<string> buffs;
 	private MetronomeManager metronomeManager;
 	private EndOfLevel ending;
+	private ProgressManager progManager;
 
 	void Start(){
 		ending = FindObjectOfType<EndOfLevel> ();
@@ -22,6 +25,15 @@ public class PowerupManager : MonoBehaviour {
 		metronomeManager = FindObjectOfType<MetronomeManager> ();
 		if (!metronomeManager) {
 			Debug.Log ("Unable to find powerup manager!");
+		}
+
+		progManager = FindObjectOfType<ProgressManager> ();
+		if (!progManager) {
+			
+			Instantiate (progManagerPrefab);
+			progManager = FindObjectOfType<ProgressManager> ();
+			progManager.gameObject.transform.SetParent(GameObject.Find ("Managers").transform);
+			Debug.Log ("Unable to find progress manager, creating one.");
 		}
 
 		buffs = new HashSet<string>();
@@ -39,13 +51,18 @@ public class PowerupManager : MonoBehaviour {
 
 	public void AddPowerUp (Powerup p)
 	{
-		powerUps [p] = true;
 		p.gameObject.SetActive (false);
 
 		if (p.name.Contains("Metronome")) {
+			powerUps [p] = true;
+
 			AddBuff ("Metronome");
 		} else if (p.name.Contains("Fragment")) {
+			powerUps [p] = true;
+
 			UpdateFragments ();
+		} else if (p.name.Contains("TripletJump")) {
+			progManager.AddUpgrade (Upgrade.TripletJump);
 		}
 
 	}
@@ -62,7 +79,9 @@ public class PowerupManager : MonoBehaviour {
 		UpdateBuffs ();
 	}
 
+	private void EnableTripletJump(){
 
+	}
 
 	void UpdateBuffs ()
 	{
@@ -108,7 +127,11 @@ public class PowerupManager : MonoBehaviour {
 		foreach (Powerup p in savedState.Keys) {
 			powerUps.Add (p, savedState [p]);
 			//Debug.Log ("Adding " + p.name + ", " + savedState[p] + " to saved PowerUps");
-			p.gameObject.SetActive (!savedState[p]);
+
+			if (p.GetPowerUpType() != "Upgrade") {
+				p.gameObject.SetActive (!savedState[p]);
+
+			}
 			if (savedState [p]) {
 				AddPowerUp (p);
 			}
