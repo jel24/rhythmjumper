@@ -16,6 +16,7 @@ public class PowerupManager : MonoBehaviour {
 	private EndOfLevel ending;
 	private ProgressManager progManager;
 
+
 	void Start(){
 		ending = FindObjectOfType<EndOfLevel> ();
 		if (!ending) {
@@ -32,8 +33,10 @@ public class PowerupManager : MonoBehaviour {
 			
 			Instantiate (progManagerPrefab);
 			progManager = FindObjectOfType<ProgressManager> ();
-			progManager.gameObject.transform.SetParent(GameObject.Find ("Managers").transform);
 			Debug.Log ("Unable to find progress manager, creating one.");
+			//FindObjectOfType<JumpTypeManager> ().AddJumpType (JumpType.Quarter);
+			Invoke ("InitializeJumpTypesFromProgressManager", .25f);
+
 		}
 
 		buffs = new HashSet<string>();
@@ -41,10 +44,19 @@ public class PowerupManager : MonoBehaviour {
 		powerUps = new Dictionary<Powerup, bool>();
 
 		foreach (Powerup p in FindObjectsOfType<Powerup>()) {
-			powerUps.Add (p, false);
+			if (p.GetPowerUpType() != "Permanent") {
+				powerUps.Add (p, false);
+			}
 		}
 
 		SaveState ();
+	}
+
+
+	private void InitializeJumpTypesFromProgressManager(){
+		progManager.AddJumpType (JumpType.Quarter);
+		FindObjectOfType<JumpTypeManager> ().AddJumpType (JumpType.Quarter);
+
 	}
 
 	// powerups are represented in the level
@@ -53,16 +65,20 @@ public class PowerupManager : MonoBehaviour {
 	{
 		p.gameObject.SetActive (false);
 
-		if (p.name.Contains("Metronome")) {
+		if (p.name.Contains ("Metronome")) {
 			powerUps [p] = true;
 
 			AddBuff ("Metronome");
-		} else if (p.name.Contains("Fragment")) {
+		} else if (p.name.Contains ("Fragment")) {
 			powerUps [p] = true;
 
 			UpdateFragments ();
-		} else if (p.name.Contains("TripletJump")) {
+		} else if (p.name.Contains ("TripletJump")) {
 			progManager.AddUpgrade (Upgrade.TripletJump);
+		} else if (p.name.Contains ("QuarterJump")) {
+			progManager.AddJumpType(JumpType.Quarter);
+			FindObjectOfType<JumpTypeManager> ().AddJumpType (JumpType.Quarter);
+			metronomeManager.musicLevel = true;
 		}
 
 	}

@@ -5,26 +5,30 @@ using UnityEngine;
 public class TrailManager : MonoBehaviour {
 
 	public Object trailParticle;
-	public GameObject player;
 
 	private int frameCounter;
 	private List<Vector2> locations;
 	private List<Object> particles;
 	private bool recording;
 	private Vector2 prevLoc;
+	private Transform playerTransform;
 
 	void Start (){
 		locations = new List<Vector2> ();
 		particles = new List<Object> ();
 		recording = true;
 		prevLoc = new Vector2 (0f, 0f);
+		playerTransform = FindObjectOfType<PlayerController> ().gameObject.transform;
+		if (!playerTransform) {
+			Debug.Log ("Unable to find Player.");
+		}
 	}
 
 	// Update is called once per frame
 	void Update () {
 		frameCounter++;
 		if (frameCounter % 10 == 0 && recording){
-			Vector2 loc = new Vector2 (player.transform.position.x, player.transform.position.y);
+			Vector2 loc = new Vector2 (playerTransform.position.x, playerTransform.position.y);
 			
 			if (loc != prevLoc){
 				locations.Add (loc);

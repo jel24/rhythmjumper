@@ -5,26 +5,22 @@ using UnityEngine;
 public enum Upgrade
 {
 	TripletJump,
-	EighthJump,
-	QuarterJump,
-	HalfJump,
-	WholeJump
 }
 
 public class ProgressManager : MonoBehaviour {
 
+	[SerializeField]
 	private HashSet<Upgrade> upgrades;
 
+	[SerializeField]
+	private HashSet<JumpType> jumpTypes;
 
-	void Awake() {
-		DontDestroyOnLoad(transform.gameObject);
-	}
-
-	// Use this for initialization
-	void Start () {
+	void Start() {
+		DontDestroyOnLoad(gameObject);
 		upgrades = new HashSet<Upgrade>();
+		jumpTypes = new HashSet<JumpType>();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		
@@ -36,7 +32,17 @@ public class ProgressManager : MonoBehaviour {
 		}
 	}
 
+	public void AddJumpType(JumpType j){
+		if (!jumpTypes.Contains(j)){
+			jumpTypes.Add (j);
+		}
+	}
+
 	public bool HasUpgrade(Upgrade u){
 		return upgrades.Contains (u);
+	}
+
+	public HashSet<JumpType> GetJumpTypes(){
+		return jumpTypes;
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour {
 
-	public GameObject player;
 	public GameObject background;
 	public float thresholdX;
 	public float thresholdY;
@@ -11,10 +10,14 @@ public class CameraController : MonoBehaviour {
 	public float defaultSize;
 
 	private Camera cam;
-
+	private Transform playerTransform;
 
 	void Start () {
 		cam = GetComponent<Camera> ();
+		playerTransform = FindObjectOfType<PlayerController> ().gameObject.transform;
+		if (!playerTransform) {
+			Debug.Log ("Unable to find Player.");
+		}
 	}
 
 	// Update is called once per frame
@@ -22,7 +25,7 @@ public class CameraController : MonoBehaviour {
 	{
 		float transformX = 0f;
 		float transformY = 0f;
-		Vector3 playerPos = player.transform.position;
+		Vector3 playerPos = playerTransform.position;
 		Vector3 camPos = transform.position;
 
 		if (Mathf.Abs (playerPos.x - camPos.x) > thresholdX) {

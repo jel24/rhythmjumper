@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public enum JumpType {
+	Default,
 	Eighth,
 	Quarter,
 	Half,
@@ -19,17 +20,17 @@ public class JumpTypeManager : MonoBehaviour {
 
 	private List<JumpTypeNote> typeList;
 	private PlayerCounter counter;
-
+	private ProgressManager progressManager;
 	private Vector2[] jumpTypeNotePositions;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		typeList = new List<JumpTypeNote> ();
 		counter = FindObjectOfType<PlayerCounter> ();
 		if (!counter) {
 			Debug.Log ("Unable to find PlayerCounter");
 		}
-			
+
 		jumpTypeNotePositions = new Vector2[7];
 
 		jumpTypeNotePositions[0] = new Vector2 (-6f, 0f);
@@ -40,8 +41,24 @@ public class JumpTypeManager : MonoBehaviour {
 		jumpTypeNotePositions[5] = new Vector2 (4f, 0f);
 		jumpTypeNotePositions[6] = new Vector2 (6f, 0f);
 
-		AddJumpType (JumpType.Quarter);
 
+		progressManager = FindObjectOfType<ProgressManager> ();
+		if (!progressManager) {
+			Debug.Log ("Unable to find ProgressManager.");
+		} 
+	}
+
+	void Start(){
+		if (progressManager) {
+			Invoke ("InitializeJumpTypesFromProgressManager", .25f);
+
+		}
+	}
+
+	private void InitializeJumpTypesFromProgressManager(){
+		foreach (JumpType j in progressManager.GetJumpTypes ()) {
+			AddJumpType (j);
+		}
 	}
 
 	public void AddJumpType(JumpType j){

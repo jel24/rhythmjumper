@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour {
 
 	public float moveSpeed;
 	public float jumpSpeed;
-	public float jumpCooldownMax;
+	public float jumpCooldown;
 	public int maxBonusJumps;
 	public AudioClip waterSound;
 	public AudioClip missSound;
@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour {
 
 	private int jumps;
 	private int bonusJumps;
-	private float jumpCooldown;
+	private float stun;
 	private int metronomeCounter;
 	private int tripletCounter;
 
@@ -89,8 +89,8 @@ public class PlayerController : MonoBehaviour {
 			Debug.Log ("Unable to find ProgressManager.");
 		}
 
-		jumpCooldown = 0f;
-		jumpCooldownMax = 0.1f;
+		stun = 0f;
+		jumpCooldown = 0.1f;
 		jumpDelegate += OnJump;
 
 
@@ -106,11 +106,10 @@ public class PlayerController : MonoBehaviour {
 		prevFrames [1] = prevFrames [0];
 		prevFrames [0] = inputX;
 
-		if (jumpCooldown > 0f) {
-			jumpCooldown -= Time.deltaTime;
-			//print (jumpCooldown);
+		if (stun > 0f) {
+			stun -= Time.deltaTime;
 		} else {
-			jumpCooldown = 0f;
+			stun  = 0f;
 		}
 
 		if (statusManager.IsAlive () && inWater) {
@@ -179,7 +178,7 @@ public class PlayerController : MonoBehaviour {
 		if (rigidbody.isKinematic) {
 			rigidbody.isKinematic = false;
 		}
-		if (CrossPlatformInputManager.GetButtonDown ("Jump") && !(jumpCooldown < 0f)) {
+		if (CrossPlatformInputManager.GetButtonDown ("Jump") && !(stun < 0f)) {
 			Jump ();
 		}
 		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft") && !jumping) {
@@ -199,11 +198,11 @@ public class PlayerController : MonoBehaviour {
 		}
 			
 
-			if (!onWallRight && inputX >= 0 && !jumping || !onWallLeft && inputX <= 0 && !jumping) {
+		if (!onWallRight && inputX >= 0 && !jumping && stun <= 0 || !onWallLeft && inputX <= 0 && !jumping && stun <= 0) {
 				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
 			} 
 
-			if (jumping && jumpCooldown <= 0) {
+			if (jumping && stun <= 0) {
 				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
 			}
 
@@ -230,7 +229,7 @@ public class PlayerController : MonoBehaviour {
 		int maxJumps = 0;
 		JumpType j = jumpTypeManager.getJumpType ();
 
-
+		Debug.Log (j);
 
 		switch (j) {
 		case JumpType.Eighth:
@@ -252,6 +251,7 @@ public class PlayerController : MonoBehaviour {
 		default:
 			print ("No jump types available.");
 			jumpModifier = 1.0f;
+			maxJumps = 1;
 			break;
 		}
 
@@ -261,18 +261,18 @@ public class PlayerController : MonoBehaviour {
 			jumpDelegate ();
 			jumping = true;
 
-			if (playerCounter.IsOnBeat ()) {
+			if (playerCounter.IsOnBeat () || !metronomeManager.musicLevel) {
 				playerCounter.Hit ();
 
 				if (onWallLeft) {
 					rigidbody.velocity = new Vector2 (5f, jumpSpeed * jumpModifier);
-					jumpCooldown += jumpCooldownMax;
+					stun += jumpCooldown;
 				} else if (onWallRight) {
 					rigidbody.velocity = new Vector2 (-5f, jumpSpeed * jumpModifier);
-					jumpCooldown += jumpCooldownMax;
+					stun += jumpCooldown;
 				} else {
 					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
-					jumpCooldown += jumpCooldownMax;
+					stun += jumpCooldown;
 				}
 
 
@@ -296,14 +296,12 @@ public class PlayerController : MonoBehaviour {
 
 				if (onWallLeft) {
 					rigidbody.velocity = new Vector2 (3f, jumpSpeed * jumpModifier * .67f);
-					jumpCooldown += jumpCooldownMax;
 				} else if (onWallRight) {
 					rigidbody.velocity = new Vector2 (-3f, jumpSpeed * jumpModifier * .67f);
-					jumpCooldown += jumpCooldownMax;
 				} else {
 					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier * .67f);
-					jumpCooldown += jumpCooldownMax;
 				}
+				stun += jumpCooldown;
 
 			}
 
@@ -314,9 +312,9 @@ public class PlayerController : MonoBehaviour {
 			Debug.Log (bonusJumps + " jumps left.");
 
 
-			if (playerCounter.IsOnBeat () && !playerCounter.ActiveBeatHitBefore() && jumpCooldown == 0) {
+			if (playerCounter.IsOnBeat () && !playerCounter.ActiveBeatHitBefore() && stun == 0) {
 				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
-				jumpCooldown += jumpCooldownMax;
+				stun += jumpCooldown;
 				Debug.Log ("On beat!");
 				playerCounter.Hit ();
 				//Display positive particles
@@ -343,7 +341,7 @@ public class PlayerController : MonoBehaviour {
 
 			} else {
 				rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .67f, jumpSpeed * jumpModifier * .67f);
-				jumpCooldown += jumpCooldownMax;
+				stun += jumpCooldown;
 				playerCounter.Miss ();
 				// Display negative particles
 				ParticleTimer jumpFX = Instantiate (negativePrefab) as ParticleTimer;
@@ -416,7 +414,7 @@ public class PlayerController : MonoBehaviour {
 				refreshJumps = 0;
 				break;
 			default:
-				print ("No jump types available.");
+				//print ("No jump types available.");
 				break;
 			}
 
@@ -561,7 +559,11 @@ public class PlayerController : MonoBehaviour {
 		inWater = isInWater;
 
 	}
-		
+
+	public void AddStun(float duration){
+		stun += duration;
+		Debug.Log ("Adding stun.");
+	}
 
 	public void ChangeSlipStatus(bool inSlipRegion){
 		isSlippery = inSlipRegion;

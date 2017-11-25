@@ -38,7 +38,7 @@ public class PlayerCounter : MonoBehaviour {
 
 		}
 
-		UpdateBeatDisplayForJumpType (JumpType.Quarter);
+		UpdateBeatDisplayForJumpType ();
 	}
 
 	void OnTriggerEnter2D (Collider2D coll){
@@ -169,4 +169,9 @@ public class PlayerCounter : MonoBehaviour {
 		}
 	}
 
+	public void UpdateBeatDisplayForJumpType(){
+		foreach (Beat b in beats){
+			b.UpdateForJumpType (false);
+		}
+	}
 }
