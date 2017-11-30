@@ -12,6 +12,7 @@ public class EndOfLevel : MonoBehaviour {
 	private int fragmentsOwned;
 	private Text text;
 	private LoadManager loader;
+	private ProgressManager progManager;
 
 	void Start(){
 
@@ -24,6 +25,12 @@ public class EndOfLevel : MonoBehaviour {
 		if (!loader) {
 			Debug.Log ("Can't find LoadManager.");
 		}
+
+		progManager = FindObjectOfType<ProgressManager> ();
+		if (!progManager) {
+			Debug.Log ("Unable to find progress manager.");
+
+		}
 	}
 
 	void OnTriggerEnter2D(Collider2D c){
@@ -32,6 +39,7 @@ public class EndOfLevel : MonoBehaviour {
 			c.GetComponentInParent<PlayerStatusManager> ().ToggleActive ();
 			loader.FadeOut ();
 			Invoke ("LoadLevel", 1.25f);
+			progManager.SetLatestLevel (targetLevel);
 		}
 	}
 

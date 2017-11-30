@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerController : MonoBehaviour {
 
@@ -49,6 +51,7 @@ public class PlayerController : MonoBehaviour {
 	private PowerupManager powerupManager;
 	private PlayerCounter playerCounter;
 	private JumpTypeManager jumpTypeManager;
+	private int cancelCounter;
 
 
 	float[] prevFrames = new float[3] {0, 0, 0};
@@ -191,6 +194,16 @@ public class PlayerController : MonoBehaviour {
 
 		if (CrossPlatformInputManager.GetButtonDown ("Triplet") && progManager.HasUpgrade(Upgrade.TripletJump)) {
 			TripletJump ();
+		}
+
+		if (CrossPlatformInputManager.GetButton ("Cancel")) {
+			cancelCounter++;
+			print(cancelCounter);
+			if (cancelCounter >= 180){
+				SceneManager.LoadScene("menu");
+			}
+		} else {
+			cancelCounter = 0;
 		}
 
 		if (CrossPlatformInputManager.GetButtonDown ("UsePowerup")) {

@@ -15,10 +15,18 @@ public class ProgressManager : MonoBehaviour {
 	[SerializeField]
 	private HashSet<JumpType> jumpTypes;
 
+	private string latestLevel;
+
 	void Start() {
 		DontDestroyOnLoad(gameObject);
 		upgrades = new HashSet<Upgrade>();
 		jumpTypes = new HashSet<JumpType>();
+		string loadPrefs = PlayerPrefs.GetString ("LatestLevel");
+		if (loadPrefs == "") {
+			SetLatestLevel ("level1-1");
+		} else {
+			SetLatestLevel (loadPrefs);
+		}
 	}
 
 	// Update is called once per frame
@@ -36,6 +44,15 @@ public class ProgressManager : MonoBehaviour {
 		if (!jumpTypes.Contains(j)){
 			jumpTypes.Add (j);
 		}
+	}
+
+	public void SetLatestLevel(string s){
+		PlayerPrefs.SetString ("LatestLevel", s);
+		latestLevel = s;
+	}
+
+	public string GetLatestLevel(){
+		return latestLevel;
 	}
 
 	public bool HasUpgrade(Upgrade u){
