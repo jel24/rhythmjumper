@@ -39,7 +39,7 @@ public class CameraController : MonoBehaviour {
 		if (transformX != 0f || transformY != 0f) {
 			Vector3 translationVector = new Vector3(transformX, transformY, 0f);
 			transform.Translate(translationVector);
-			background.transform.Translate(translationVector/5f);
+			background.transform.Translate(-translationVector/15f);
 		}
 
 		if (cam.orthographicSize > targetSize) {
