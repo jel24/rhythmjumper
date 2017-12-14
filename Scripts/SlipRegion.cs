@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class SlipRegion : MonoBehaviour {
 
-	BoxCollider2D boxCollider;
+	private BoxCollider2D boxCollider;
+
+	private ParticleSystem particles;
 
 
 	void OnDrawGizmos(){
@@ -13,6 +15,14 @@ public class SlipRegion : MonoBehaviour {
 		boxCollider = GetComponent<BoxCollider2D> ();
 		Gizmos.DrawCube(Vector3.zero, new Vector3(boxCollider.size.x, boxCollider.size.y, 1f));
 	}
+
+	void Start(){
+		boxCollider = GetComponent<BoxCollider2D> ();
+		particles = GetComponent<ParticleSystem> ();
+		ParticleSystem.ShapeModule particleShape = particles.shape;
+		particleShape.scale = new Vector3 (boxCollider.size.x, boxCollider.size.y, 0f);
+	}
+
 
 	void OnTriggerEnter2D(Collider2D coll)
 	{
