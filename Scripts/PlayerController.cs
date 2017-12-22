@@ -210,6 +210,9 @@ public class PlayerController : MonoBehaviour {
 			UsePowerup ();
 		}
 			
+		if (CrossPlatformInputManager.GetButtonDown ("AlecButton")) {
+			playerCounter.AlecMode ();
+		}
 
 		if (!onWallRight && inputX >= 0 && !jumping && stun <= 0 || !onWallLeft && inputX <= 0 && !jumping && stun <= 0) {
 				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);

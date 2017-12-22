@@ -174,4 +174,10 @@ public class PlayerCounter : MonoBehaviour {
 			b.UpdateForJumpType (false);
 		}
 	}
+
+	public void AlecMode(){
+		foreach (Beat b in beats){
+			b.alecMode = !b.alecMode;
+		}
+	}
 }

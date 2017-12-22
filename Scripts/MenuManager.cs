@@ -70,6 +70,7 @@ public class MenuManager : MonoBehaviour {
 			SceneManager.LoadSceneAsync ("level1-1");
 			break;
 		case "Continue":
+			progManager.LoadFromPlayerPrefs ();
 			SceneManager.LoadSceneAsync (progManager.GetLatestLevel());
 			break;
 		case "Exit":

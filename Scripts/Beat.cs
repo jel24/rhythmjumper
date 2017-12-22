@@ -16,6 +16,7 @@ public class Beat : MonoBehaviour {
 	private float opacity;
 	private int framesPerBeat;
 	private bool activeForJumpType;
+	public bool alecMode;
 
 	// Use this for initialization
 	void Start () {
@@ -101,6 +102,10 @@ public class Beat : MonoBehaviour {
 		} else {
 			opacity += .03f;
 
+		}
+
+		if (alecMode) {
+			opacity = 0f;
 		}
 
 		text.color = new Color (currentColor.r, currentColor.g, currentColor.b, opacity);

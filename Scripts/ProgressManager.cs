@@ -48,6 +48,7 @@ public class ProgressManager : MonoBehaviour {
 
 	public void SetLatestLevel(string s){
 		PlayerPrefs.SetString ("LatestLevel", s);
+		SaveToPlayerPrefs ();
 		latestLevel = s;
 	}
 
@@ -61,5 +62,23 @@ public class ProgressManager : MonoBehaviour {
 
 	public HashSet<JumpType> GetJumpTypes(){
 		return jumpTypes;
+	}
+
+	public void SaveToPlayerPrefs(){
+		if (jumpTypes.Contains(JumpType.Quarter)){
+			PlayerPrefs.SetInt ("QuarterJump", 1);
+		}
+		if (upgrades.Contains(Upgrade.TripletJump)){
+			PlayerPrefs.SetInt ("TripletJump", 1);
+		}
+	}
+
+	public void LoadFromPlayerPrefs(){
+		if (PlayerPrefs.GetInt("QuarterJump") == 1) {
+			AddJumpType (JumpType.Quarter);
+		}
+		if (PlayerPrefs.GetInt("TripletJump") == 1) {
+			AddUpgrade (Upgrade.TripletJump);
+		}
 	}
 }

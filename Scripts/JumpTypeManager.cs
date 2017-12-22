@@ -50,15 +50,16 @@ public class JumpTypeManager : MonoBehaviour {
 
 	void Start(){
 		if (progressManager) {
-			Invoke ("InitializeJumpTypesFromProgressManager", .25f);
+			Invoke ("InitializeAbilitiesFromProgressManager", .25f);
 
 		}
 	}
 
-	private void InitializeJumpTypesFromProgressManager(){
+	private void InitializeAbilitiesFromProgressManager(){
 		foreach (JumpType j in progressManager.GetJumpTypes ()) {
 			AddJumpType (j);
 		}
+
 	}
 
 	public void AddJumpType(JumpType j){
