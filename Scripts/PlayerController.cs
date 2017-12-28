@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
 	public AudioClip waterSound;
 	public AudioClip missSound;
 	public AudioClip hitSound;
+	public AudioClip[] jumpSounds;
 	public delegate void OnJumpFunctionsDelegate ();
 	public static OnJumpFunctionsDelegate jumpDelegate;
 
@@ -441,6 +442,10 @@ public class PlayerController : MonoBehaviour {
 				animator.SetBool ("onwall", false);
 				feetTouching = true;
 				tripletJumpUsed = false;
+				//if (!onWallLeft && !onWallRight) {
+					//audioSource.clip = jumpSounds[jumpSounds.Length-1];
+					//audioSource.Play ();
+				//}
 			} else if (name == "Head") {
 				headTouching = true;
 			} else if (name == "Left" && !isSlippery) {
@@ -532,8 +537,9 @@ public class PlayerController : MonoBehaviour {
 			phoenixFX.GetComponent<ParticleTimer>().SetExpiration(4f);
 			phoenixFX.transform.position = transform.position;
 			bonusJumps = maxJumps;
-			rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * 2f);
-
+			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 2.25f);
+			animator.SetTrigger ("grace");
+			AddStun (1f);
 		}
 	}
 
@@ -603,6 +609,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void OnJump(){
+		//audioSource.clip = jumpSounds[Random.Range(0, jumpSounds.Length-1)];
+		//audioSource.Play ();
+
 		//Debug.Log ("Delegated!");
 	}
 }

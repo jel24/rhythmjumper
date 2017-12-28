@@ -13,7 +13,9 @@ public class PlayerComponent : MonoBehaviour {
 	void OnTriggerEnter2D (Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			parent.StartTouching(gameObject.name);
+			if (!coll.GetComponent<BoxCollider2D> ().isTrigger) {
+				parent.StartTouching(gameObject.name);
+			}
 		}
 	}
 
@@ -27,28 +29,10 @@ public class PlayerComponent : MonoBehaviour {
 	void OnTriggerStay2D (Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Wall") {
-			parent.StartTouching(gameObject.name);
+			if (!coll.GetComponent<BoxCollider2D> ().isTrigger) {
+				parent.StartTouching(gameObject.name);
+			}
 		}
 	}
 
-	void OnCollisionEnter2D (Collision2D coll)
-	{
-		if (coll.gameObject.tag == "Wall") {
-			parent.StartTouching(gameObject.name);
-		}
-	}
-
-	void OnCollisionStay2D (Collision2D coll)
-	{
-		if (coll.gameObject.tag == "Wall") {
-			parent.StartTouching(gameObject.name);
-		}
-	}
-
-	void OnCollisionExit2D (Collision2D coll)
-	{
-		if (coll.gameObject.tag == "Wall") {
-			parent.EndTouching(gameObject.name);
-		}
-	}
 }
