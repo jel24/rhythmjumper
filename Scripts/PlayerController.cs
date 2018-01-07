@@ -18,16 +18,11 @@ public class PlayerController : MonoBehaviour {
 	public static OnJumpFunctionsDelegate jumpDelegate;
 
 	public bool jumping;
-	public ParticleTimer gracePrefab;
-	public ParticleTimer waterPrefab;
-	public ParticleTimer splashPrefab;
-	public ParticleTimer phoenixPrefab;
-	public ParticleTimer positivePrefab;
-	public ParticleTimer negativePrefab;
 
 	private MetronomeManager metronomeManager;
 	private PlayerStatusManager statusManager;
 	private ProgressManager progManager;
+	private ParticleManager particleManager;
 
 	private int jumps;
 	private int bonusJumps;
@@ -92,6 +87,10 @@ public class PlayerController : MonoBehaviour {
 		if (!progManager) {
 			Debug.Log ("Unable to find ProgressManager.");
 		}
+		particleManager = FindObjectOfType<ParticleManager> ();
+		if (!progManager) {
+			Debug.Log ("Unable to find ParticleManager.");
+		}
 
 		stun = 0f;
 		jumpCooldown = 0.1f;
@@ -141,9 +140,8 @@ public class PlayerController : MonoBehaviour {
 		}
 		if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
 			animator.SetTrigger ("stroke");
-			ParticleTimer waterFX = Instantiate (waterPrefab, gameObject.transform) as ParticleTimer;
-			waterFX.GetComponent<ParticleTimer> ().SetExpiration (3f);
-			waterFX.transform.position = transform.position;
+			AddParticlesOnPlayer (ParticleType.Bubbles);
+
 			if (inputX > 0) {
 				renderer.flipX = false;
 			}
@@ -173,6 +171,11 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		return inputX;
+	}
+
+	private void AddParticlesOnPlayer(ParticleType p){
+		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity, gameObject.transform);
+
 	}
 
 	void ProcessStandardMovement ()
@@ -306,9 +309,8 @@ public class PlayerController : MonoBehaviour {
 				playerCounter.Miss ();
 
 				// Display negative particles
-				ParticleTimer jumpFX = Instantiate (negativePrefab) as ParticleTimer;
-				jumpFX.GetComponent<ParticleTimer>().SetExpiration(3f);
-				jumpFX.transform.position = transform.position;
+				AddParticlesOnPlayer (ParticleType.JumpFailure);
+
 				//
 
 				if (onWallLeft) {
@@ -334,11 +336,7 @@ public class PlayerController : MonoBehaviour {
 				stun += jumpCooldown;
 				Debug.Log ("On beat!");
 				playerCounter.Hit ();
-				//Display positive particles
-				ParticleTimer jumpFX = Instantiate (positivePrefab) as ParticleTimer;
-				jumpFX.GetComponent<ParticleTimer>().SetExpiration(3f);
-				jumpFX.transform.position = transform.position;
-				//
+				AddParticlesOnPlayer (ParticleType.JumpSuccess);
 
 				audioSource.clip = hitSound;
 				audioSource.Play ();
@@ -361,9 +359,8 @@ public class PlayerController : MonoBehaviour {
 				stun += jumpCooldown;
 				playerCounter.Miss ();
 				// Display negative particles
-				ParticleTimer jumpFX = Instantiate (negativePrefab) as ParticleTimer;
-				jumpFX.GetComponent<ParticleTimer>().SetExpiration(3f);
-				jumpFX.transform.position = transform.position;
+				AddParticlesOnPlayer (ParticleType.JumpFailure);
+
 				//
 
 				audioSource.clip = missSound;
@@ -381,7 +378,7 @@ public class PlayerController : MonoBehaviour {
 
 		tripletCounter += 1;
 		print (tripletCounter);
-		if (tripletCounter == 2 && !tripletJumpUsed) {
+		if (tripletCounter == 2 && !tripletJumpUsed && playerCounter.ActiveBeatHitBefore()) {
 			tripletJumpUsed = true;
 			float jumpModifier;
 			JumpType j = jumpTypeManager.getJumpType ();
@@ -407,7 +404,10 @@ public class PlayerController : MonoBehaviour {
 
 			bonusJumps = 0;
 			tripletCounter = 0;
-			rigidbody.velocity = new Vector2 (rigidbody.velocity.x * 1.5f, jumpSpeed * jumpModifier * 1.5f);
+			AddParticlesOnPlayer (ParticleType.Triplet);
+
+			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 1.65f);
+			animator.SetTrigger ("grace");
 		}
 	}
 
@@ -533,9 +533,8 @@ public class PlayerController : MonoBehaviour {
 				break;
 			}
 
-			ParticleTimer phoenixFX = Instantiate (phoenixPrefab, gameObject.transform) as ParticleTimer;
-			phoenixFX.GetComponent<ParticleTimer>().SetExpiration(4f);
-			phoenixFX.transform.position = transform.position;
+			AddParticlesOnPlayer (ParticleType.Phoenix);
+
 			bonusJumps = maxJumps;
 			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 2.25f);
 			animator.SetTrigger ("grace");
@@ -554,9 +553,8 @@ public class PlayerController : MonoBehaviour {
 			feetTouching = false;
 			headTouching = false;
 			animator.SetBool ("inWater", true);
-			ParticleTimer waterFX = Instantiate (splashPrefab) as ParticleTimer;
-			waterFX.GetComponent<ParticleTimer>().SetExpiration(3f);
-			waterFX.transform.position = transform.position;
+			AddParticlesOnPlayer (ParticleType.Bubbles);
+
 
 		} else {
 			bonusJumps = 1;
@@ -568,9 +566,8 @@ public class PlayerController : MonoBehaviour {
 				animator.SetTrigger ("grace");
 				powerupManager.RemoveBuff ("Grace");
 				print ("Graceful exit.");
-				ParticleTimer waterFX = Instantiate (gracePrefab, gameObject.transform) as ParticleTimer;
-				waterFX.GetComponent<ParticleTimer> ().SetExpiration (4f);
-				waterFX.transform.position = transform.position;
+				AddParticlesOnPlayer (ParticleType.Bubbles);
+
 				GetComponent<AudioSource> ().clip = waterSound;
 				GetComponent<AudioSource> ().Play ();
 			} else {

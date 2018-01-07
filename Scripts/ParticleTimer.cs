@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ParticleTimer : MonoBehaviour {
 
-	public void SetExpiration(float timedLife){
-		Invoke ("DestroyEmitter", timedLife);
+	void Start(){
+		Invoke ("DestroyEmitter", 4f);
 	}
 
 	private void DestroyEmitter(){
