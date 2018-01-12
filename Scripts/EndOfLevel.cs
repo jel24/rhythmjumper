@@ -14,7 +14,11 @@ public class EndOfLevel : MonoBehaviour {
 	private LoadManager loader;
 	private ProgressManager progManager;
 
+	private bool loadTriggered;
+
 	void Start(){
+
+		loadTriggered = false;
 
 		text = GetComponentInChildren<Text> ();
 		if (!text) {
@@ -35,7 +39,8 @@ public class EndOfLevel : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D c){
 		//if (c.tag == "Player" && fragmentsOwned >= fragmentsRequired) {
-		if (c.tag == "Player") {
+		if (c.tag == "Player" && !loadTriggered) {
+			loadTriggered = true;
 			c.GetComponentInParent<PlayerStatusManager> ().ToggleActive ();
 			loader.FadeOut ();
 			Invoke ("LoadLevel", 1.25f);

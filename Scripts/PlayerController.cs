@@ -149,14 +149,14 @@ public class PlayerController : MonoBehaviour {
 				if (inputX < 0) {
 					renderer.flipX = true;
 				}
-			if (powerupManager.HasBuff ("Grace")) {
-				powerupManager.RemoveBuff ("Grace");
-			}
+		//	if (powerupManager.HasBuff ("Grace")) {
+		//		powerupManager.RemoveBuff ("Grace");
+		//	}
 			if (playerCounter.IsOnBeat ()) {
 				playerCounter.Hit ();
 				if (playerCounter.StreakStatus () >= 4) {
 					playerCounter.ResetStreak ();
-					powerupManager.AddBuff ("Grace");
+					//powerupManager.AddBuff ("Grace");
 					Invoke ("RemoveGraceBuff", 1f);
 					rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
 				}
@@ -249,7 +249,7 @@ public class PlayerController : MonoBehaviour {
 		int maxJumps = 0;
 		JumpType j = jumpTypeManager.getJumpType ();
 
-		Debug.Log (j);
+		//Debug.Log (j);
 
 		switch (j) {
 		case JumpType.Eighth:
@@ -294,16 +294,7 @@ public class PlayerController : MonoBehaviour {
 					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
 					stun += jumpCooldown;
 				}
-
-
-				if (powerupManager.HasBuff ("MetronomeActive")){
-					metronomeCounter++;
-
-					if (metronomeCounter >= maxJumps){
-						print ("Removing Metronome, expired.");
-						powerupManager.RemoveBuff ("MetronomeActive");
-					}
-				}
+					
 
 			} else {
 				playerCounter.Miss ();
@@ -345,14 +336,6 @@ public class PlayerController : MonoBehaviour {
 					playerCounter.LastJump ();
 				}
 
-				if (powerupManager.HasBuff ("MetronomeActive")){
-					metronomeCounter++;
-
-					if (metronomeCounter >= maxJumps){
-						print ("Removing Metronome, expired.");
-						powerupManager.RemoveBuff ("MetronomeActive");
-					}
-				}
 
 			} else {
 				rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .67f, jumpSpeed * jumpModifier * .67f);
@@ -508,9 +491,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void UsePowerup(){
-		if (powerupManager.HasBuff ("Metronome")) {
+		if (powerupManager.HasPowerup(Powerup.Phoenix)) {
 			metronomeCounter = 0;
-			powerupManager.RemoveBuff ("Metronome");
+			powerupManager.UsePowerup (Powerup.Phoenix);
 
 			JumpType j = jumpTypeManager.getJumpType ();
 			int maxJumps = 0;
@@ -561,10 +544,11 @@ public class PlayerController : MonoBehaviour {
 			animator.SetBool ("inWater", false);
 			rigidbody.gravityScale = 1.25f;
 			rigidbody.drag = 0f;
+			/*
 			if (powerupManager.HasBuff ("Grace")) {
 				rigidbody.velocity = new Vector2 (0f, 13f);
 				animator.SetTrigger ("grace");
-				powerupManager.RemoveBuff ("Grace");
+				//powerupManager.RemoveBuff ("Grace");
 				print ("Graceful exit.");
 				AddParticlesOnPlayer (ParticleType.Bubbles);
 
@@ -573,6 +557,7 @@ public class PlayerController : MonoBehaviour {
 			} else {
 				rigidbody.AddForce(new Vector2 (0f, 2f));
 			}
+			*/
 		}
 
 		inWater = isInWater;
@@ -589,7 +574,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void RemoveGraceBuff(){
-		powerupManager.RemoveBuff ("Grace");
+		//powerupManager.RemoveBuff ("Grace");
 	}
 
 	public bool IsInWater(){

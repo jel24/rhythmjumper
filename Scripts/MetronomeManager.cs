@@ -29,11 +29,6 @@ public class MetronomeManager : MonoBehaviour {
 			Debug.Log ("Unable to find player status manager!");
 		}
 
-		powerupManager = FindObjectOfType<PowerupManager> ();
-		if (!powerupManager) {
-			Debug.Log ("Unable to find powerup manager!");
-		}
-			
 		playerStatusManager = FindObjectOfType<PlayerStatusManager> ();
 		if (!playerStatusManager) {
 			Debug.Log ("Unable to find player!");
@@ -56,15 +51,6 @@ public class MetronomeManager : MonoBehaviour {
 		bps = tempo / 60f;
 		InvokeRepeating ("Downbeat", 1f / bps, 1f / bps);
 		InvokeRepeating ("Upbeat", 1f / bps / 2, 1f / bps);
-	}
-
-	public void changePowerUpStatus (int type, bool onOff)
-	{
-		powerUpImages[type].gameObject.SetActive(onOff);
-	}
-
-	public bool GetPowerUpStatus (int type){
-		return powerUpImages [type].gameObject.activeInHierarchy;
 	}
 
 	public void Downbeat (){

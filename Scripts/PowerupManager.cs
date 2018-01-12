@@ -8,14 +8,13 @@ public class PowerupManager : MonoBehaviour {
 	public Text text;
 	public Object progManagerPrefab;
 
-	private Dictionary<Powerup, bool> powerUps;
-	private Dictionary<Powerup, bool> savedState;
+	private HashSet<Pickup> powerUps;
+	private Dictionary<Pickup, PickupStatus> savedState;
 
-	private HashSet<string> buffs;
 	private MetronomeManager metronomeManager;
 	private EndOfLevel ending;
 	private ProgressManager progManager;
-
+	private PowerupUIManager powerupUI;
 
 	void Start(){
 		ending = FindObjectOfType<EndOfLevel> ();
@@ -28,6 +27,11 @@ public class PowerupManager : MonoBehaviour {
 			Debug.Log ("Unable to find powerup manager!");
 		}
 
+		powerupUI = FindObjectOfType<PowerupUIManager> ();
+		if (!powerupUI) {
+			Debug.Log ("Unable to find powerup UI!");
+		}
+
 		progManager = FindObjectOfType<ProgressManager> ();
 		if (!progManager) {
 			
@@ -38,16 +42,19 @@ public class PowerupManager : MonoBehaviour {
 			Invoke ("InitializeJumpTypesFromProgressManager", .25f);
 
 		}
+			
+		powerUps = new HashSet<Pickup>();
 
-		buffs = new HashSet<string>();
+		GameObject.Find ("PowerupImage_Metronome");
 
-		powerUps = new Dictionary<Powerup, bool>();
-
-		foreach (Powerup p in FindObjectsOfType<Powerup>()) {
-			if (p.GetPowerUpType() != "Permanent") {
-				powerUps.Add (p, false);
+		foreach (Pickup p in FindObjectsOfType<Pickup>()) {
+			if (p.GetPowerUpType() != Powerup.Upgrade) {
+				powerUps.Add (p);
+				print (p.GetPowerUpType());
 			}
 		}
+
+		powerupUI.InitiatePowerupUI (powerUps);
 
 		SaveState ();
 	}
@@ -61,97 +68,81 @@ public class PowerupManager : MonoBehaviour {
 
 	// powerups are represented in the level
 
-	public void AddPowerUp (Powerup p)
+	public void AddPowerUp (Pickup p)
 	{
-		p.gameObject.SetActive (false);
+		print ("Adding powerup " + p.GetPowerUpType ());
+		p.SetStatus (PickupStatus.Held);
 
-		if (p.name.Contains ("Metronome")) {
-			powerUps [p] = true;
+		switch (p.GetPowerUpType ()) {
 
-			AddBuff ("Metronome");
-		} else if (p.name.Contains ("Fragment")) {
-			powerUps [p] = true;
-
-			UpdateFragments ();
-		} else if (p.name.Contains ("TripletJump")) {
+		case Powerup.Phoenix:
+			break;
+		case Powerup.TripletJump:
 			progManager.AddUpgrade (Upgrade.TripletJump);
-		} else if (p.name.Contains ("QuarterJump")) {
+			break;
+		case Powerup.Fragment:
+			//UpdateFragments ();
+			break;
+		case Powerup.QuarterJump:
 			progManager.AddJumpType(JumpType.Quarter);
 			FindObjectOfType<JumpTypeManager> ().AddJumpType (JumpType.Quarter);
 			metronomeManager.musicLevel = true;
+			break;
+		default:
+			break;
 		}
 
-	}
-
-	// buffs are represented on the buff bar. powerups create buffs when held
-
-	public void AddBuff(string buffType){
-		buffs.Add (buffType);
-		UpdateBuffs ();
-	}
-
-	public void RemoveBuff (string buffType){
-		buffs.Remove (buffType);
-		UpdateBuffs ();
-	}
-
-	private void EnableTripletJump(){
-
-	}
-
-	void UpdateBuffs ()
-	{
-
-		metronomeManager.changePowerUpStatus (0, buffs.Contains("Metronome"));
-		metronomeManager.changePowerUpStatus (1, buffs.Contains("Streak"));
-		metronomeManager.changePowerUpStatus (2, buffs.Contains("MetronomeActive"));
-		metronomeManager.changePowerUpStatus (3, buffs.Contains("Grace"));
-
+		powerupUI.UpdateUI (powerUps);
 	}
 
 	void UpdateFragments(){
 		int count = 0;
-		foreach (Powerup p in powerUps.Keys) {
-			if (p.name.Contains("Fragment") && powerUps[p]){
-				count++;
-			}
-		}
-		text.text = count + "";
-		ending.UpdateFragments (count);
+		//foreach (Powerup p in powerUps.Keys) {
+		//	if (p.name.Contains("Fragment") && powerUps[p]){
+		//		count++;
+		//	}
+		//}
+		//text.text = count + "";
+		//ending.UpdateFragments (count);
 	}
-
-	public bool HasBuff (string b)
-	{
-		return buffs.Contains (b);
-	}
-
-	private void ResetBuffs(){
-		buffs.Clear ();
-		UpdateBuffs ();
-	}
+		
 
 	public void SaveState(){
-		savedState = new Dictionary<Powerup, bool> ();
-		foreach (Powerup p in powerUps.Keys) {
-			savedState.Add (p, powerUps [p]);
+		savedState = new Dictionary<Pickup, PickupStatus> ();
+		foreach (Pickup p in powerUps) {
+			savedState.Add (p, p.GetStatus());
 		}
 	}
 
 	public void LoadState(){
-		ResetBuffs ();
-		powerUps = new Dictionary<Powerup, bool> ();
-		foreach (Powerup p in savedState.Keys) {
-			powerUps.Add (p, savedState [p]);
-			//Debug.Log ("Adding " + p.name + ", " + savedState[p] + " to saved PowerUps");
+		powerUps = new HashSet<Pickup> ();
+		foreach (Pickup p in savedState.Keys) {
+			powerUps.Add (p);
+			p.SetStatus(savedState [p]);
+		}
+		powerupUI.UpdateUI (powerUps);
+		UpdateFragments ();
+	}
 
-			if (p.GetPowerUpType() != "Upgrade") {
-				p.gameObject.SetActive (!savedState[p]);
-
-			}
-			if (savedState [p]) {
-				AddPowerUp (p);
+	public bool HasPowerup(Powerup p){
+		foreach (Pickup q in powerUps){
+			if (q.GetPowerUpType () == p && q.GetStatus() == PickupStatus.Held) {
+				return true;
 			}
 		}
-		UpdateFragments ();
+		return false;
+	}
+
+	public void UsePowerup(Powerup p){
+		Pickup targetPickup = null;
+		foreach (Pickup q in powerUps){
+			if (q.GetPowerUpType () == p && q.GetStatus() == PickupStatus.Held) {
+				targetPickup = q;
+			}
+		}
+		if (targetPickup) {
+			targetPickup.SetStatus(PickupStatus.Used);
+			powerupUI.UpdateUI (powerUps);
+		}
 	}
 }

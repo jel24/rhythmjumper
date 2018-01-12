@@ -7,7 +7,6 @@ public class PlayerStatusManager : MonoBehaviour {
 	public Vector3 startLocation;
 	private Animator animator;
 	private bool alive;
-	private HashSet<Powerup> powerups;
 	private PowerupManager powerupManager;
 	private MetronomeManager metronomeManager;
 	private TrailManager trailManager;
@@ -22,7 +21,9 @@ public class PlayerStatusManager : MonoBehaviour {
 	{
 		startLocation = transform.position;
 		animator = GetComponent<Animator> ();
-		powerups = new HashSet<Powerup>();
+		alive = false;
+
+
 
 		powerupManager = FindObjectOfType<PowerupManager> ();
 		if (!powerupManager) {
@@ -44,7 +45,6 @@ public class PlayerStatusManager : MonoBehaviour {
 			Debug.Log ("Unable to find camera controller!");		
 		}
 
-		alive = false;
 	}
 	
 	public void Kill ()
@@ -73,10 +73,6 @@ public class PlayerStatusManager : MonoBehaviour {
 	private void Respawn ()
 	{
 		if (metronomeManager.musicLevel) {
-
-			foreach (Powerup p in powerups) {
-				p.gameObject.SetActive(true);
-			}
 			powerupManager.LoadState ();
 		}
 
