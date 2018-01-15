@@ -75,13 +75,11 @@ public class PowerupManager : MonoBehaviour {
 
 		switch (p.GetPowerUpType ()) {
 
-		case Powerup.Phoenix:
-			break;
 		case Powerup.TripletJump:
 			progManager.AddUpgrade (Upgrade.TripletJump);
 			break;
 		case Powerup.Fragment:
-			//UpdateFragments ();
+			UpdateFragments ();
 			break;
 		case Powerup.QuarterJump:
 			progManager.AddJumpType(JumpType.Quarter);
@@ -97,13 +95,12 @@ public class PowerupManager : MonoBehaviour {
 
 	void UpdateFragments(){
 		int count = 0;
-		//foreach (Powerup p in powerUps.Keys) {
-		//	if (p.name.Contains("Fragment") && powerUps[p]){
-		//		count++;
-		//	}
-		//}
-		//text.text = count + "";
-		//ending.UpdateFragments (count);
+		foreach (Pickup p in powerUps) {
+			if (p.GetStatus() == PickupStatus.Held){
+				count++;
+			}
+		}
+		text.text = count + "";
 	}
 		
 

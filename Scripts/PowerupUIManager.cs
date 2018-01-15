@@ -9,7 +9,7 @@ public class PowerupUIManager : MonoBehaviour {
 
 	private Dictionary<Powerup, GameObject> powerupImages;
 
-	void Start(){
+	void Awake(){
 		powerupImages = new Dictionary<Powerup, GameObject> ();
 	}
 
@@ -17,14 +17,14 @@ public class PowerupUIManager : MonoBehaviour {
 	public void InitiatePowerupUI(HashSet<Pickup> powerups) {
 		foreach (Pickup p in powerups) {
 			switch (p.GetPowerUpType()) {
-			case Powerup.Phoenix:
-				GameObject newImage = Instantiate (phoenixImage, imageLocation[0], Quaternion.identity, gameObject.transform) as GameObject;
-				newImage.SetActive (false);
-				powerupImages.Add (p.GetPowerUpType (), newImage);
-				print ("Adding Phoenix");
-				break;
-			default:
-				break;
+				case Powerup.Phoenix:
+					GameObject newImage = Instantiate (phoenixImage, imageLocation[0], Quaternion.identity, gameObject.transform) as GameObject;
+					newImage.SetActive (false);
+					powerupImages.Add (Powerup.Phoenix, newImage);
+					print ("Adding Phoenix");
+					break;
+				default:
+					break;
 			}
 		}
 	}
