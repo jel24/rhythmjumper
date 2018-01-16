@@ -178,6 +178,11 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
+	private void AddParticlesAtPlayer(ParticleType p){
+		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity);
+
+	}
+
 	void ProcessStandardMovement ()
 	{
 		float inputX = CrossPlatformInputManager.GetAxis ("Horizontal");
@@ -442,7 +447,7 @@ public class PlayerController : MonoBehaviour {
 				}
 				if (!feetTouching) {
 					animator.SetBool ("onwall", true);
-
+					AddParticlesAtPlayer (ParticleType.WallDustLeft);
 				}
 				animator.SetBool ("jumping", false);
 				renderer.flipX = true;
@@ -457,6 +462,7 @@ public class PlayerController : MonoBehaviour {
 				}
 				if (!feetTouching) {
 					animator.SetBool ("onwall", true);
+					AddParticlesAtPlayer (ParticleType.WallDustRight);
 
 				}
 				animator.SetBool ("jumping", false);

@@ -4,8 +4,15 @@ using UnityEngine;
 
 public class ParticleTimer : MonoBehaviour {
 
+	public float DestroyTimer;
+
 	void Start(){
-		Invoke ("DestroyEmitter", 4f);
+		if (DestroyTimer > 0f) {
+			Invoke ("DestroyEmitter", DestroyTimer);
+		} else {
+			Invoke ("DestroyEmitter", 4f);
+
+		}
 	}
 
 	private void DestroyEmitter(){

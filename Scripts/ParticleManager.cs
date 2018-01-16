@@ -7,7 +7,9 @@ public enum ParticleType{
 	JumpSuccess,
 	JumpFailure,
 	Triplet,
-	Bubbles
+	Bubbles,
+	WallDustLeft,
+	WallDustRight
 }
 
 public class ParticleManager : MonoBehaviour {
@@ -18,6 +20,9 @@ public class ParticleManager : MonoBehaviour {
 	public Object JumpFailureParticle;
 	public Object TripletParticle;
 	public Object BubbleParticle;
+	public Object WallDustLeftParticle;
+	public Object WallDustRightParticle;
+
 
 	private Dictionary<ParticleType, Object> particles;
 
@@ -30,8 +35,8 @@ public class ParticleManager : MonoBehaviour {
 		particles.Add (ParticleType.JumpFailure, JumpFailureParticle);
 		particles.Add (ParticleType.Triplet, TripletParticle);
 		particles.Add (ParticleType.Bubbles, BubbleParticle);
-
-
+		particles.Add (ParticleType.WallDustLeft, WallDustLeftParticle);
+		particles.Add (ParticleType.WallDustRight, WallDustRightParticle);
 
 	}
 
