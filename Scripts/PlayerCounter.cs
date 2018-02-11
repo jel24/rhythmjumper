@@ -46,7 +46,7 @@ public class PlayerCounter : MonoBehaviour {
 			if (coll.GetComponent<Beat> ().IsActiveForJumpType ()) {
 				activeBeat = coll.GetComponent<Beat> ();
 				//Debug.Log (coll.name);
-				GetComponentInParent<PlayerController>().ResetTriplets();
+				GetComponentInParent<PlayerStatusManager>().ResetTriplets();
 			}
 
 		}

@@ -28,14 +28,14 @@ public class SlipRegion : MonoBehaviour {
 	{
 
 		if (coll.gameObject.tag == "Player") {
-			coll.GetComponentInParent<PlayerController> ().ChangeSlipStatus (true);
+			coll.GetComponentInParent<PlayerStatusManager> ().ChangeSlipStatus (true);
 		} 
 	}
 
 	void OnTriggerExit2D(Collider2D coll)
 	{
 		if (coll.gameObject.tag == "Player") {
-			coll.GetComponentInParent<PlayerController> ().ChangeSlipStatus (false);
+			coll.GetComponentInParent<PlayerStatusManager> ().ChangeSlipStatus (false);
 		} 
 	}
 

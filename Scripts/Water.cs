@@ -5,7 +5,7 @@ using UnityEngine;
 public class Water : MonoBehaviour {
 
 	bool waterSpam;
-
+	/*
 	void OnTriggerEnter2D(Collider2D coll)
 	{
 
@@ -30,5 +30,5 @@ public class Water : MonoBehaviour {
 
 	private void StopWaterSpam(){
 		waterSpam = false;
-	}
+	}*/
 }

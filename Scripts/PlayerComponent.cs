@@ -3,11 +3,11 @@ using System.Collections;
 
 public class PlayerComponent : MonoBehaviour {
 
-	PlayerController parent;
+	PlayerStatusManager parent;
 
 	void Start ()
 	{
-		parent = gameObject.GetComponentInParent<PlayerController>();
+		parent = gameObject.GetComponentInParent<PlayerStatusManager>();
 	}
 
 	void OnTriggerEnter2D (Collider2D coll)

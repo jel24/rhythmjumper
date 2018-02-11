@@ -6,202 +6,70 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 
-	public float moveSpeed;
+	public float[] moveSpeeds;
 	public float jumpSpeed;
 	public float jumpCooldown;
 	public int maxBonusJumps;
-	public AudioClip waterSound;
-	public AudioClip missSound;
-	public AudioClip hitSound;
-	public AudioClip[] jumpSounds;
 	public delegate void OnJumpFunctionsDelegate ();
 	public static OnJumpFunctionsDelegate jumpDelegate;
 
-	public bool jumping;
-
 	private MetronomeManager metronomeManager;
 	private PlayerStatusManager statusManager;
-	private ProgressManager progManager;
-	private ParticleManager particleManager;
-
-	private int jumps;
-	private int bonusJumps;
 	private float stun;
-	private int metronomeCounter;
-	private int tripletCounter;
-
 	private Rigidbody2D rigidbody;
-	private Animator animator;
-	private SpriteRenderer renderer;
-	private AudioSource audioSource;
-
-	private bool onWallRight;
-	private bool onWallLeft;
-	private bool headTouching;
-	private bool feetTouching;
-	private bool inWater;
-	private bool isSlippery;
-	private bool tripletJumpUsed;
-
-	private Vector2 waterAddedVelocity;
-	private PowerupManager powerupManager;
-	private PlayerCounter playerCounter;
-	private JumpTypeManager jumpTypeManager;
 	private int cancelCounter;
-
-
-	float[] prevFrames = new float[3] {0, 0, 0};
 
 	// Use this for initialization
 	void Start () {
 		rigidbody = GetComponent<Rigidbody2D>();
-		animator = GetComponent<Animator>();
-		renderer = GetComponent<SpriteRenderer>();
 		statusManager = GetComponent<PlayerStatusManager>();
-		audioSource = GetComponent<AudioSource> ();
-
-		inWater = false;
-		isSlippery = false;
-		tripletJumpUsed = false;
 
 		if (!statusManager) {
 			Debug.Log ("Unable to find StatusManager!");
 		}
-		powerupManager = FindObjectOfType<PowerupManager> ();
-		if (!powerupManager) {
-			Debug.Log ("Unable to find PowerupManager!");
-		}
+
 		metronomeManager = FindObjectOfType<MetronomeManager> ();
 		if (!metronomeManager) {
 			Debug.Log ("Unable to find MetronomeManager!");
 		}
-		playerCounter = FindObjectOfType<PlayerCounter> ();
-		if (!playerCounter) {
-			Debug.Log ("Unable to find PlayerCounter!");
-		}
-		jumpTypeManager = FindObjectOfType<JumpTypeManager> ();
-		if (!jumpTypeManager) {
-			Debug.Log ("Unable to find JumpTypeManager!");
-		}
-		progManager = FindObjectOfType<ProgressManager> ();
-		if (!progManager) {
-			Debug.Log ("Unable to find ProgressManager.");
-		}
-		particleManager = FindObjectOfType<ParticleManager> ();
-		if (!progManager) {
-			Debug.Log ("Unable to find ParticleManager.");
-		}
-
+			
 		stun = 0f;
-		jumpCooldown = 0.1f;
 		jumpDelegate += OnJump;
-
 
 	}
 	
 	// Update is called once per frame
-	void LateUpdate ()
+	void Update ()
 	{
-
-		float inputX = CrossPlatformInputManager.GetAxis ("Horizontal");
-		// Debug.Log (inputX);
-		prevFrames [2] = prevFrames [1];
-		prevFrames [1] = prevFrames [0];
-		prevFrames [0] = inputX;
-
 		if (stun > 0f) {
 			stun -= Time.deltaTime;
 		} else {
 			stun  = 0f;
 		}
-
-		if (statusManager.IsAlive () && inWater) {
-			ProcessWaterMovement ();
-
-		} else if (statusManager.IsAlive () && !inWater) {
-			ProcessStandardMovement ();
-
-		} else {
-			if (rigidbody.isKinematic == false && statusManager.IsAlive() == false) {
-				rigidbody.isKinematic = true;
-				rigidbody.velocity = Vector2.zero;
-			}
-
-		}
-			
+		ProcessMovement ();
 	}
 
-	private float ProcessWaterMovement ()
+
+	private void ProcessMovement ()
 	{
 		float inputX = CrossPlatformInputManager.GetAxis ("Horizontal");
 		float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
-		if (rigidbody.isKinematic) {
-			rigidbody.isKinematic = false;
-		}
-		if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
-			animator.SetTrigger ("stroke");
-			AddParticlesOnPlayer (ParticleType.Bubbles);
 
-			if (inputX > 0) {
-				renderer.flipX = false;
-			}
-			else
-				if (inputX < 0) {
-					renderer.flipX = true;
-				}
-		//	if (powerupManager.HasBuff ("Grace")) {
-		//		powerupManager.RemoveBuff ("Grace");
-		//	}
-			if (playerCounter.IsOnBeat ()) {
-				playerCounter.Hit ();
-				if (playerCounter.StreakStatus () >= 4) {
-					playerCounter.ResetStreak ();
-					//powerupManager.AddBuff ("Grace");
-					Invoke ("RemoveGraceBuff", 1f);
-					rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.5f, inputY * moveSpeed * 1.5f);
-				}
-				else {
-					rigidbody.velocity = new Vector2 (inputX * moveSpeed * 1.25f, inputY * moveSpeed * 1.25f);
-				}
-			}
-			else {
-				playerCounter.Miss ();
-				rigidbody.velocity = new Vector2 (inputX * moveSpeed, inputY * moveSpeed * .50f);
-				playerCounter.ResetStreak ();
-			}
-		}
-		return inputX;
-	}
+		MovePlayer (inputX);
 
-	private void AddParticlesOnPlayer(ParticleType p){
-		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity, gameObject.transform);
-
-	}
-
-	private void AddParticlesAtPlayer(ParticleType p){
-		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity);
-
-	}
-
-	void ProcessStandardMovement ()
-	{
-		float inputX = CrossPlatformInputManager.GetAxis ("Horizontal");
-		float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
-		if (rigidbody.isKinematic) {
-			rigidbody.isKinematic = false;
-		}
 		if (CrossPlatformInputManager.GetButtonDown ("Jump") && !(stun < 0f)) {
 			Jump ();
 		}
-		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft") && !jumping) {
-			jumpTypeManager.SwapLeft ();
+
+		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft")) {
+			//jumpTypeManager.SwapLeft ();
+		}
+	
+		if (CrossPlatformInputManager.GetButtonDown ("SwapRight")) {
+			//jumpTypeManager.SwapRight ();
 		}
 
-		if (CrossPlatformInputManager.GetButtonDown ("SwapRight") && !jumping) {
-			jumpTypeManager.SwapRight ();
-		}
-
-		if (CrossPlatformInputManager.GetButtonDown ("Triplet") && progManager.HasUpgrade(Upgrade.TripletJump)) {
+		if (CrossPlatformInputManager.GetButtonDown ("Triplet")) {
 			TripletJump ();
 		}
 
@@ -220,150 +88,37 @@ public class PlayerController : MonoBehaviour {
 		}
 			
 		if (CrossPlatformInputManager.GetButtonDown ("AlecButton")) {
-			playerCounter.AlecMode ();
+			//playerCounter.AlecMode ();
+		}
+			
+	}
+
+	private void MovePlayer(float inputX){
+		float moveSpeed = 0f;
+
+		if (Mathf.Abs (inputX) > 0 && Mathf.Abs (inputX) < .33) {
+			moveSpeed = moveSpeeds [0];
+		} else if (Mathf.Abs (inputX) > .33 && Mathf.Abs (inputX) < .66) {
+			moveSpeed = moveSpeeds [1];
+		} else if (Mathf.Abs (inputX) > .67) {
+			moveSpeed = moveSpeeds [2];
 		}
 
-		if (!onWallRight && inputX >= 0 && !jumping && stun <= 0 || !onWallLeft && inputX <= 0 && !jumping && stun <= 0) {
-				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
-			} 
-
-			if (jumping && stun <= 0) {
-				rigidbody.velocity = new Vector2 (moveSpeed * inputX, rigidbody.velocity.y);
-			}
-
-			if (!jumping) {
-				animator.SetBool ("running", true);
-			}
-			if (inputX > 0) {
-				renderer.flipX = false;
-			} else if (inputX < 0) {
-				renderer.flipX = true;
-			}
-
-		if (!jumping && Mathf.Abs (inputX) > 0) {
-			animator.SetBool ("running", true);
-		} else if (!jumping && inputX == 0) {
-			animator.SetBool ("running", false);
-
+		if (inputX < 0) {
+			moveSpeed *= -1;
 		}
+
+		rigidbody.velocity = new Vector2 (moveSpeed, rigidbody.velocity.y);
 	}
 
 	private void Jump ()
 	{
-		float jumpModifier;
-		int maxJumps = 0;
-		JumpType j = jumpTypeManager.getJumpType ();
-
-		//Debug.Log (j);
-
-		switch (j) {
-		case JumpType.Eighth:
-			jumpModifier = .67f;
-			maxJumps = 8;
-			break;
-		case JumpType.Quarter:
-			jumpModifier = 1f;
-			maxJumps = 4;
-			break;
-		case JumpType.Half:
-			jumpModifier = 1.33f;
-			maxJumps = 2;
-			break;
-		case JumpType.Whole:	
-			jumpModifier = 2f;
-			maxJumps = 1;
-			break;
-		default:
-			print ("No jump types available.");
-			jumpModifier = 1.0f;
-			maxJumps = 1;
-			break;
-		}
-
-
-
-		if (!jumping) {
-			jumpDelegate ();
-			jumping = true;
-
-			if (playerCounter.IsOnBeat () || !metronomeManager.musicLevel) {
-				playerCounter.Hit ();
-
-				if (onWallLeft) {
-					rigidbody.velocity = new Vector2 (5f, jumpSpeed * jumpModifier);
-					stun += jumpCooldown;
-				} else if (onWallRight) {
-					rigidbody.velocity = new Vector2 (-5f, jumpSpeed * jumpModifier);
-					stun += jumpCooldown;
-				} else {
-					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
-					stun += jumpCooldown;
-				}
-					
-
-			} else {
-				playerCounter.Miss ();
-
-				// Display negative particles
-				AddParticlesOnPlayer (ParticleType.JumpFailure);
-
-				//
-
-				if (onWallLeft) {
-					rigidbody.velocity = new Vector2 (3f, jumpSpeed * jumpModifier * .67f);
-				} else if (onWallRight) {
-					rigidbody.velocity = new Vector2 (-3f, jumpSpeed * jumpModifier * .67f);
-				} else {
-					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier * .67f);
-				}
-				stun += jumpCooldown;
-
-			}
-
-		} else if (jumping && bonusJumps > 0) {
-			jumpDelegate ();
-			animator.SetTrigger ("doubleJump");
-			bonusJumps--;
-			Debug.Log (bonusJumps + " jumps left.");
-
-
-			if (playerCounter.IsOnBeat () && !playerCounter.ActiveBeatHitBefore() && stun == 0) {
-				rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed * jumpModifier);
-				stun += jumpCooldown;
-				Debug.Log ("On beat!");
-				playerCounter.Hit ();
-				AddParticlesOnPlayer (ParticleType.JumpSuccess);
-
-				audioSource.clip = hitSound;
-				audioSource.Play ();
-
-				if (bonusJumps == 0) {
-					playerCounter.LastJump ();
-				}
-
-
-			} else {
-				rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .67f, jumpSpeed * jumpModifier * .67f);
-				stun += jumpCooldown;
-				playerCounter.Miss ();
-				// Display negative particles
-				AddParticlesOnPlayer (ParticleType.JumpFailure);
-
-				//
-
-				audioSource.clip = missSound;
-				audioSource.Play ();
-
-			}
-		} else {
-			Debug.Log ("Out of jumps!");
-		}
-
+		rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 	}
 
 	private void TripletJump(){
 
-
+		/*
 		tripletCounter += 1;
 		print (tripletCounter);
 		if (tripletCounter == 2 && !tripletJumpUsed && playerCounter.ActiveBeatHitBefore()) {
@@ -397,107 +152,12 @@ public class PlayerController : MonoBehaviour {
 			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 1.65f);
 			animator.SetTrigger ("grace");
 		}
-	}
 
-	public void StartTouching (string name)
-	{
-		if (!inWater) {
-			JumpType j = jumpTypeManager.getJumpType ();
-			int refreshJumps = 0;
-
-			switch (j) {
-			case JumpType.Eighth:
-				refreshJumps = 7;
-				break;
-			case JumpType.Quarter:
-				refreshJumps = 3;
-				break;
-			case JumpType.Half:
-				refreshJumps = 1;
-				break;
-			case JumpType.Whole:
-				refreshJumps = 0;
-				break;
-			default:
-				//print ("No jump types available.");
-				break;
-			}
-
-			if (name == "Feet") {
-				jumping = false;
-				bonusJumps = refreshJumps;
-				animator.SetBool ("jumping", false);
-				animator.SetBool ("onwall", false);
-				feetTouching = true;
-				tripletJumpUsed = false;
-				//if (!onWallLeft && !onWallRight) {
-					//audioSource.clip = jumpSounds[jumpSounds.Length-1];
-					//audioSource.Play ();
-				//}
-			} else if (name == "Head") {
-				headTouching = true;
-			} else if (name == "Left" && !isSlippery) {
-				onWallLeft = true;
-				tripletJumpUsed = false;
-				jumping = false;
-				if (!headTouching) {
-					bonusJumps = refreshJumps;
-					//Debug.Log("Resetting jumps LEFT.");
-
-				}
-				if (!feetTouching) {
-					animator.SetBool ("onwall", true);
-					AddParticlesAtPlayer (ParticleType.WallDustLeft);
-				}
-				animator.SetBool ("jumping", false);
-				renderer.flipX = true;
-			} else if (name == "Right" && !isSlippery) {
-				onWallRight = true;
-				jumping = false;
-				tripletJumpUsed = false;
-
-				if (!headTouching) {
-					bonusJumps = refreshJumps;
-					//Debug.Log("Resetting jumps RIGHT.");
-				}
-				if (!feetTouching) {
-					animator.SetBool ("onwall", true);
-					AddParticlesAtPlayer (ParticleType.WallDustRight);
-
-				}
-				animator.SetBool ("jumping", false);
-				renderer.flipX = false;
-			}
-
-		}
-	}
-
-	public void EndTouching (string name)
-	{
-			if (name == "Feet") {
-				animator.SetBool ("jumping", true);
-				jumping = true;
-				feetTouching = false;
-			} else if (name == "Head") {
-				headTouching = false;
-			} else if (name == "Left") {
-				onWallLeft = false;
-				jumping = true;
-				animator.SetBool("jumping", true);
-				animator.SetBool("onwall", false);
-				renderer.flipX = false;
-			} else if (name == "Right") {
-				onWallRight = false;
-				jumping = true;
-				animator.SetBool("jumping", true);
-				animator.SetBool("onwall", false);
-				renderer.flipX = true;
-			}
-
+*/
 	}
 
 	private void UsePowerup(){
-		if (powerupManager.HasPowerup(Powerup.Phoenix)) {
+		/*if (powerupManager.HasPowerup(Powerup.Phoenix)) {
 			metronomeCounter = 0;
 			powerupManager.UsePowerup (Powerup.Phoenix);
 
@@ -528,74 +188,20 @@ public class PlayerController : MonoBehaviour {
 			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 2.25f);
 			animator.SetTrigger ("grace");
 			AddStun (1f);
-		}
+		}*/
 	}
 
-	public void ChangeWaterStatus(bool isInWater){
-
-		if (isInWater) {
-			bonusJumps = 1;
-			rigidbody.gravityScale = -.2f;
-			rigidbody.drag = 2f;
-			onWallRight = false;
-			onWallLeft = false;
-			feetTouching = false;
-			headTouching = false;
-			animator.SetBool ("inWater", true);
-			AddParticlesOnPlayer (ParticleType.Bubbles);
-
-
-		} else {
-			bonusJumps = 1;
-			animator.SetBool ("inWater", false);
-			rigidbody.gravityScale = 1.25f;
-			rigidbody.drag = 0f;
-			/*
-			if (powerupManager.HasBuff ("Grace")) {
-				rigidbody.velocity = new Vector2 (0f, 13f);
-				animator.SetTrigger ("grace");
-				//powerupManager.RemoveBuff ("Grace");
-				print ("Graceful exit.");
-				AddParticlesOnPlayer (ParticleType.Bubbles);
-
-				GetComponent<AudioSource> ().clip = waterSound;
-				GetComponent<AudioSource> ().Play ();
-			} else {
-				rigidbody.AddForce(new Vector2 (0f, 2f));
-			}
-			*/
-		}
-
-		inWater = isInWater;
-
-	}
 
 	public void AddStun(float duration){
 		stun += duration;
 		Debug.Log ("Adding stun.");
 	}
-
-	public void ChangeSlipStatus(bool inSlipRegion){
-		isSlippery = inSlipRegion;
-	}
-
-	private void RemoveGraceBuff(){
-		//powerupManager.RemoveBuff ("Grace");
-	}
-
-	public bool IsInWater(){
-		return inWater;
-	}
+		
 
 	public void AddFunctionToJump(OnJumpFunctionsDelegate method){
 		jumpDelegate += method;
 	}
-
-	public void ResetTriplets(){
-		tripletCounter = 0;
-		//print ("Resetting triplets");
-	}
-
+		
 	private void OnJump(){
 		//audioSource.clip = jumpSounds[Random.Range(0, jumpSounds.Length-1)];
 		//audioSource.Play ();
