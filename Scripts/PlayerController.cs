@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour {
 			stun  = 0f;
 		}
 		ProcessMovement ();
+
 	}
 
 
@@ -55,11 +56,16 @@ public class PlayerController : MonoBehaviour {
 		float inputX = CrossPlatformInputManager.GetAxis ("Horizontal");
 		float inputY = CrossPlatformInputManager.GetAxis ("Vertical");
 
-		MovePlayer (inputX);
+		if (!(stun > 0f)) {
+			
+			MovePlayer (inputX);
 
-		if (CrossPlatformInputManager.GetButtonDown ("Jump") && !(stun < 0f)) {
-			Jump ();
+			if (CrossPlatformInputManager.GetButtonDown ("Jump")) {
+				Jump ();
+			}
 		}
+
+
 
 		if (CrossPlatformInputManager.GetButtonDown ("SwapLeft")) {
 			//jumpTypeManager.SwapLeft ();
@@ -94,66 +100,66 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void MovePlayer(float inputX){
-		float moveSpeed = 0f;
 
-		if (Mathf.Abs (inputX) > 0 && Mathf.Abs (inputX) < .33) {
-			moveSpeed = moveSpeeds [0];
-		} else if (Mathf.Abs (inputX) > .33 && Mathf.Abs (inputX) < .66) {
-			moveSpeed = moveSpeeds [1];
-		} else if (Mathf.Abs (inputX) > .67) {
-			moveSpeed = moveSpeeds [2];
+		float delta = inputX * .5f;
+		float moveSpeed = rigidbody.velocity.x + delta;
+
+		switch (statusManager.CurrentState) {
+		case MovementState.OnWallLeft:
+		case MovementState.OnWallRight:
+			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeeds [2] * -1, moveSpeeds [2]);
+			//float fallSpeed = Mathf.Clamp (rigidbody.velocity.y, rigidbody.velocity.y, -1.5f);
+			rigidbody.velocity = new Vector2 (moveSpeed, -1.5f);
+			break;
+			break;
+		default:
+			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeeds [2] * -1, moveSpeeds [2]);
+			rigidbody.velocity = new Vector2 (moveSpeed, rigidbody.velocity.y);
+			break;
 		}
 
-		if (inputX < 0) {
-			moveSpeed *= -1;
-		}
-
-		rigidbody.velocity = new Vector2 (moveSpeed, rigidbody.velocity.y);
 	}
 
 	private void Jump ()
 	{
-		rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
+		if (statusManager.CanJumpAgain()){
+			AddStun (jumpCooldown);
+			switch (statusManager.CurrentState) {
+			case MovementState.OnWallLeft:
+				if (statusManager.UseJumpOnBeat ()) {
+					rigidbody.velocity = new Vector2 (5f, jumpSpeed);
+				} else {
+					rigidbody.velocity = new Vector2 (5f * .5f, jumpSpeed * .5f);
+				}
+				break;
+			case MovementState.OnWallRight:
+				if (statusManager.UseJumpOnBeat ()) {
+					rigidbody.velocity = new Vector2 (-5f, jumpSpeed);
+				} else {
+					rigidbody.velocity = new Vector2 (-5f * .5f, jumpSpeed * .5f);
+				}
+				break;
+			default:
+				if (statusManager.UseJumpOnBeat ()) {
+					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
+				} else {
+					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed  * .25f);
+				}
+				break;
+
+			}
+
+
+
+
+		}
 	}
 
 	private void TripletJump(){
-
-		/*
-		tripletCounter += 1;
-		print (tripletCounter);
-		if (tripletCounter == 2 && !tripletJumpUsed && playerCounter.ActiveBeatHitBefore()) {
-			tripletJumpUsed = true;
-			float jumpModifier;
-			JumpType j = jumpTypeManager.getJumpType ();
-
-			switch (j) {
-			case JumpType.Eighth:
-				jumpModifier = .67f;
-				break;
-			case JumpType.Quarter:
-				jumpModifier = 1f;
-				break;
-			case JumpType.Half:
-				jumpModifier = 1.33f;
-				break;
-			case JumpType.Whole:	
-				jumpModifier = 2f;
-				break;
-			default:
-				print ("No jump types available.");
-				jumpModifier = 1.0f;
-				break;
-			}
-
-			bonusJumps = 0;
-			tripletCounter = 0;
-			AddParticlesOnPlayer (ParticleType.Triplet);
-
+		if (statusManager.TripletJump()) {
 			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 1.65f);
-			animator.SetTrigger ("grace");
+			AddStun (.5f);
 		}
-
-*/
 	}
 
 	private void UsePowerup(){
@@ -194,7 +200,7 @@ public class PlayerController : MonoBehaviour {
 
 	public void AddStun(float duration){
 		stun += duration;
-		Debug.Log ("Adding stun.");
+		//Debug.Log ("Adding stun.");
 	}
 		
 

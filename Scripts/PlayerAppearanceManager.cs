@@ -30,21 +30,31 @@ public class PlayerAppearanceManager : MonoBehaviour {
 
 	}
 
-	private void AddParticlesOnPlayer(ParticleType p){
+
+	public void AddParticlesOnPlayer(ParticleType p){
 		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity, gameObject.transform);
 
 	}
 
-	private void AddParticlesAtPlayer(ParticleType p){
-		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity);
+	public void AddParticlesAtPlayer(ParticleType p){
+		Instantiate (particleManager.GetParticle (p), transform.position, Quaternion.identity, particleManager.transform);
 
 	}
 
+	public void DoubleJump(){
+		animator.SetTrigger ("doubleJump");
+		UpdateSpriteDirection ();
+
+	}
+
+	public void TripletJump(){
+		AddParticlesOnPlayer (ParticleType.Triplet);
+		animator.SetTrigger ("grace");
+	}
+
 	public void UpdateAppearanceFromMovementState(MovementState s){
-		print (s);
 		switch (s) {
 		case MovementState.Grounded:
-			print ("This is happening.");
 			animator.SetBool ("jumping", false);
 			animator.SetBool ("onwall", false);
 			if (Mathf.Abs (rigidbody.velocity.x) > 0) {
@@ -52,32 +62,42 @@ public class PlayerAppearanceManager : MonoBehaviour {
 			} else {
 				animator.SetBool ("running", false);
 			}
-
-			if (rigidbody.velocity.x < 0) {
-				renderer.flipX = true;
-			} else if (rigidbody.velocity.x > 0) {
-				renderer.flipX = false;
-
-			}
-
+			UpdateSpriteDirection ();
 			break;
-		case MovementState.OnWall:
+		case MovementState.OnWallLeft:
 			animator.SetBool ("onwall", true);
 			animator.SetBool ("running", false);
 			animator.SetBool ("jumping", false);
+			renderer.flipX = true;
+			AddParticlesAtPlayer (ParticleType.WallDustLeft);
 
 			break;
+		case MovementState.OnWallRight:
+			animator.SetBool ("onwall", true);
+			animator.SetBool ("running", false);
+			animator.SetBool ("jumping", false);
+			renderer.flipX = false;
+			AddParticlesAtPlayer (ParticleType.WallDustRight);
+			break;
 		case MovementState.Jumping:
+			UpdateSpriteDirection ();
 			animator.SetBool ("jumping", true);
 			animator.SetBool ("onwall", false);
 			animator.SetBool ("running", false);
-
 			break;
 		default:
 			break;
 		}
 	}
 
+
+	private void UpdateSpriteDirection(){
+		if (rigidbody.velocity.x < 0) {
+			renderer.flipX = true;
+		} else if (rigidbody.velocity.x > 0) {
+			renderer.flipX = false;
+		}
+	}
 }
 
 
