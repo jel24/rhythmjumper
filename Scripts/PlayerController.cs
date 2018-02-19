@@ -6,10 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 
-	public float[] moveSpeeds;
+	public float moveSpeedMax;
 	public float jumpSpeed;
 	public float jumpCooldown;
-	public int maxBonusJumps;
 	public delegate void OnJumpFunctionsDelegate ();
 	public static OnJumpFunctionsDelegate jumpDelegate;
 
@@ -101,19 +100,25 @@ public class PlayerController : MonoBehaviour {
 
 	private void MovePlayer(float inputX){
 
-		float delta = inputX * .5f;
-		float moveSpeed = rigidbody.velocity.x + delta;
+		float rate = .5f;
+		float moveSpeed = rigidbody.velocity.x;
 
 		switch (statusManager.CurrentState) {
 		case MovementState.OnWallLeft:
 		case MovementState.OnWallRight:
-			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeeds [2] * -1, moveSpeeds [2]);
+			moveSpeed = rigidbody.velocity.x + rate * inputX;
+			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeedMax * -1, moveSpeedMax);
 			//float fallSpeed = Mathf.Clamp (rigidbody.velocity.y, rigidbody.velocity.y, -1.5f);
-			rigidbody.velocity = new Vector2 (moveSpeed, -1.5f);
+			rigidbody.velocity = new Vector2 (moveSpeed, -2f);
 			break;
-			break;
+		/*case MovementState.Jumping:
+			moveSpeed = rigidbody.velocity.x + rate * inputX * 5;
+			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeedMax * -1, moveSpeedMax);
+			rigidbody.velocity = new Vector2 (moveSpeed, rigidbody.velocity.y);
+			break;*/
 		default:
-			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeeds [2] * -1, moveSpeeds [2]);
+			moveSpeed = rigidbody.velocity.x + rate * inputX;
+			moveSpeed = Mathf.Clamp (moveSpeed, moveSpeedMax * -1, moveSpeedMax);
 			rigidbody.velocity = new Vector2 (moveSpeed, rigidbody.velocity.y);
 			break;
 		}
@@ -123,27 +128,28 @@ public class PlayerController : MonoBehaviour {
 	private void Jump ()
 	{
 		if (statusManager.CanJumpAgain()){
+			OnJump ();
 			AddStun (jumpCooldown);
 			switch (statusManager.CurrentState) {
 			case MovementState.OnWallLeft:
 				if (statusManager.UseJumpOnBeat ()) {
 					rigidbody.velocity = new Vector2 (5f, jumpSpeed);
 				} else {
-					rigidbody.velocity = new Vector2 (5f * .5f, jumpSpeed * .5f);
+					rigidbody.velocity = new Vector2 (5f * .5f, jumpSpeed * .67f);
 				}
 				break;
 			case MovementState.OnWallRight:
 				if (statusManager.UseJumpOnBeat ()) {
 					rigidbody.velocity = new Vector2 (-5f, jumpSpeed);
 				} else {
-					rigidbody.velocity = new Vector2 (-5f * .5f, jumpSpeed * .5f);
+					rigidbody.velocity = new Vector2 (-5f * .5f, jumpSpeed * .67f);
 				}
 				break;
 			default:
 				if (statusManager.UseJumpOnBeat ()) {
 					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed);
 				} else {
-					rigidbody.velocity = new Vector2 (rigidbody.velocity.x, jumpSpeed  * .25f);
+					rigidbody.velocity = new Vector2 (rigidbody.velocity.x * .5f, jumpSpeed  * .67f);
 				}
 				break;
 
@@ -163,38 +169,10 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void UsePowerup(){
-		/*if (powerupManager.HasPowerup(Powerup.Phoenix)) {
-			metronomeCounter = 0;
-			powerupManager.UsePowerup (Powerup.Phoenix);
-
-			JumpType j = jumpTypeManager.getJumpType ();
-			int maxJumps = 0;
-
-			switch (j) {
-			case JumpType.Eighth:
-				maxJumps = 8;
-				break;
-			case JumpType.Quarter:
-				maxJumps = 4;
-				break;
-			case JumpType.Half:
-				maxJumps = 2;
-				break;
-			case JumpType.Whole:	
-				maxJumps = 1;
-				break;
-			default:
-				print ("No jump types available.");
-				break;
-			}
-
-			AddParticlesOnPlayer (ParticleType.Phoenix);
-
-			bonusJumps = maxJumps;
+		if (statusManager.Phoenix ()) {
 			rigidbody.velocity = new Vector2 (0f, jumpSpeed * 2.25f);
-			animator.SetTrigger ("grace");
 			AddStun (1f);
-		}*/
+		}
 	}
 
 

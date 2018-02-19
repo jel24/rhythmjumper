@@ -47,8 +47,23 @@ public class PlayerAppearanceManager : MonoBehaviour {
 
 	}
 
+	public void Hit(){
+		AddParticlesOnPlayer (ParticleType.JumpSuccess);
+
+	}
+
+	public void Miss(){
+		AddParticlesOnPlayer (ParticleType.JumpFailure);
+
+	}
+
 	public void TripletJump(){
 		AddParticlesOnPlayer (ParticleType.Triplet);
+		animator.SetTrigger ("grace");
+	}
+
+	public void Phoenix(){
+		AddParticlesOnPlayer (ParticleType.Phoenix);
 		animator.SetTrigger ("grace");
 	}
 

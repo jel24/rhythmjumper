@@ -239,8 +239,10 @@ public class PlayerStatusManager : MonoBehaviour {
 	public bool UseJumpOnBeat(){
 		jumps++;
 		if (counter.IsOnBeat ()) {
+			appearanceManager.Hit ();
 			counter.Hit ();
 		} else {
+			appearanceManager.Miss ();
 			counter.Miss ();
 		}
 
@@ -250,10 +252,19 @@ public class PlayerStatusManager : MonoBehaviour {
 
 	public bool TripletJump(){
 		tripletCounter++;
-		print (tripletCounter);
 		if (tripletCounter == 2 && !tripletJumpUsed && counter.ActiveBeatHitBefore ()) {
 			tripletCounter = 0;
 			appearanceManager.TripletJump ();
+			return true;
+		}
+		return false;
+	}
+
+	public bool Phoenix(){
+		if (powerupManager.HasPowerup(Powerup.Phoenix)) {
+			powerupManager.UsePowerup (Powerup.Phoenix);
+			appearanceManager.Phoenix ();
+			jumps = 0;
 			return true;
 		}
 		return false;
