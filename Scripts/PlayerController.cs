@@ -45,7 +45,10 @@ public class PlayerController : MonoBehaviour {
 		} else {
 			stun  = 0f;
 		}
-		ProcessMovement ();
+
+		if (statusManager.IsAlive ()) {
+			ProcessMovement ();
+		}
 
 	}
 
